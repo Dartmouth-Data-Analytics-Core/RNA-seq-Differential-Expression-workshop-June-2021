@@ -1,6 +1,7 @@
 TO DO: 
 - convert R markdowns to github md 
 - split mds up 
+- update README
 - reduce text in mds 
 
 
