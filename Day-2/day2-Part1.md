@@ -35,7 +35,7 @@ differential expression analysis of clustered datasets.
 images, to the directory on your computer!!
 
 <center>
-![Overview](/Users/shannon/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/figures/overview.png)
+![Overview](figures/overview.png)
 </center>
 Set the root directory for the whole markdown. THIS MUST BE SET TO THE
 LOCATION OF THE FOLDER YOU DOWNLOADED!
@@ -452,7 +452,7 @@ variation in sequencing depth, we might conclude some genes are
 expressed at greater levels in a sample that has simply been sequenced
 to a higher depth.
 
-![](/Users/shannon/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/figures/library_size.png)
+![](figures/library_size.png)
 
 #### Library composition
 
@@ -466,7 +466,7 @@ making it appear that these other genes are expressed at lower levels
 than in sample 2, however this is simply an artifact of library
 composition differences between the samples.
 
-![](/Users/shannon/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/figures/library_composition.png)
+![](figures/library_composition.png)
 
 To correct for **library size** AND **library composition**, DESeq2 uses
 a algorithm referred to as the **median-of-ratios** method. Although we
@@ -643,7 +643,7 @@ explains why it is better to use TPM if you need to correct for
 **library size** AND **gene length**.
 
 <center>
-![](/Users/shannon/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/figures/gene_length.png)
+![](figures/gene_length.png)
 </center>
 
 ------------------------------------------------------------------------
@@ -681,7 +681,7 @@ between the samples than PC2. If we plot PC1 against PC2, samples will
 and be further away from samples with more distant expression profiles.
 
 <center>
-![](/Users/shannon/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/figures/pca_example.png)
+![](figures/pca_example.png)
 </center>
 Again, StatQuest has an excellent
 [video](https://www.youtube.com/watch?v=_UVHneBUBW0) that explains the
@@ -915,7 +915,7 @@ that change in a similar way across our samples, and may share some
 common function of interest.
 
 <center>
-![](/Users/shannon/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/figures/heatmaps.png)
+![](figures/heatmaps.png)
 </center>
 The first step in a hierachical clustering analaysis is to *scale your
 data*. This means that expression levels are all transformed onto the
