@@ -384,9 +384,8 @@ provides an excellent explanation of *RPKM*, *FPKM*, & *TPM*, and
 explains why it is better to use TPM if you need to correct for
 **library size** AND **gene length**.
 
-<center>
+
 ![](../figures/gene_length.png)
-</center>
 
 ------------------------------------------------------------------------
 
