@@ -40,10 +40,13 @@ images, to the directory on your computer!!
 Set the root directory for the whole markdown. THIS MUST BE SET TO THE
 LOCATION OF THE FOLDER YOU DOWNLOADED!
 
+```r
     knitr::opts_knit$set(root.dir = '/Users/shannon/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/')
+```
 
 Lets start by loading the packages we will need:
 
+```r
     library(dplyr)
     library(ggplot2)
     library(tximport)
@@ -57,7 +60,7 @@ Lets start by loading the packages we will need:
     library(circlize)
     library(xtable)
     library(kableExtra)
-
+```
 ------------------------------------------------------------------------
 
 #### The dataset
@@ -81,105 +84,19 @@ quantified (e.g. at the gene or transcript level). `DESeq2` provides a
 specific function `DESeqDataSetFromHTSeqCount` to read in gene-level
 read count abundances from *htseq-count*.
 
+```r
     # read in the matrix we generated using htseq-count 
     cts <- as.matrix(read.table("Day-2/all_counts.txt", 
                                 sep="\t", header = TRUE, row.names=1, 
                                 stringsAsFactors = F))
     # quick look at the matrix 
     head(cts)
-
-    ##                 SRR1039508 SRR1039509 SRR1039510 SRR1039511 SRR1039512
-    ## ENSG00000000003        698        468        758        471        893
-    ## ENSG00000000005          0          0          0          0          0
-    ## ENSG00000000419        464        507        455        520        608
-    ## ENSG00000000457        258        206        237        227        262
-    ## ENSG00000000460         58         55         88         57         39
-    ## ENSG00000000938          0          0          0          0          2
-    ##                 SRR1039513 SRR1039514 SRR1039515 SRR1039516 SRR1039517
-    ## ENSG00000000003        420        985        878       1180       1074
-    ## ENSG00000000005          0          1          0          0          0
-    ## ENSG00000000419        357        869        447        580        781
-    ## ENSG00000000457        163        328        217        242        330
-    ## ENSG00000000460         35         87         47         77         64
-    ## ENSG00000000938          0          0          1          1          0
-    ##                 SRR1039518 SRR1039519 SRR1039520 SRR1039521 SRR1039522
-    ## ENSG00000000003       1114       1141        802        595       1125
-    ## ENSG00000000005          1          0          0          0          0
-    ## ENSG00000000419        717        510        414        500        535
-    ## ENSG00000000457        294        199        230        229        248
-    ## ENSG00000000460         66         67         76         60         84
-    ## ENSG00000000938          1          0          0          0          0
-    ##                 SRR1039523
-    ## ENSG00000000003        872
-    ## ENSG00000000005          0
-    ## ENSG00000000419        673
-    ## ENSG00000000457        277
-    ## ENSG00000000460         91
-    ## ENSG00000000938          2
-
     tail(cts)
-
-    ##                        SRR1039508 SRR1039509 SRR1039510 SRR1039511 SRR1039512
-    ## ENSG00000288111                 0          0          0          0          0
-    ## __no_feature               936867     842433    1027258     964295    1203807
-    ## __ambiguous               1729002    1587216    1724395    1639595    2089004
-    ## __too_low_aQual             31467      34647      38352      42305      51152
-    ## __not_aligned              547100     741136     670279     420256     476785
-    ## __alignment_not_unique    1033615     901230    1011957     936332    1156255
-    ##                        SRR1039513 SRR1039514 SRR1039515 SRR1039516 SRR1039517
-    ## ENSG00000288111                 0          0          0          0          0
-    ## __no_feature               618312    1625007    1108750    1218372    1467646
-    ## __ambiguous               1230442    2787173    1708909    2062034    2535139
-    ## __too_low_aQual             33739      81543      43103      52636      68199
-    ## __not_aligned              344865    1012304     474310     557462     576573
-    ## __alignment_not_unique     660376    1591279     949990    1168480    1370005
-    ##                        SRR1039518 SRR1039519 SRR1039520 SRR1039521 SRR1039522
-    ## ENSG00000288111                 1          0          0          0          0
-    ## __no_feature              1257366     954313     936202     888824    1284938
-    ## __ambiguous               2262879    1621650    1540090    1673566    2037477
-    ## __too_low_aQual             61530      42754      44372      50221      68854
-    ## __not_aligned              557606     429632     413797     505024     589176
-    ## __alignment_not_unique    1311827     951332     866864     954938    1128194
-    ##                        SRR1039523
-    ## ENSG00000288111                 0
-    ## __no_feature              1393701
-    ## __ambiguous               2245960
-    ## __too_low_aQual             57949
-    ## __not_aligned              537783
-    ## __alignment_not_unique    1279829
 
     # filter out these last 5 rows 
     cts <- cts[1:(nrow(cts)-5),]
     tail(cts)
-
-    ##                 SRR1039508 SRR1039509 SRR1039510 SRR1039511 SRR1039512
-    ## ENSG00000288106          2          2          2          7         12
-    ## ENSG00000288107          1          1          0          0          0
-    ## ENSG00000288108          0          0          0          0          0
-    ## ENSG00000288109          0          0          0          0          0
-    ## ENSG00000288110          0          0          0          0          0
-    ## ENSG00000288111          0          0          0          0          0
-    ##                 SRR1039513 SRR1039514 SRR1039515 SRR1039516 SRR1039517
-    ## ENSG00000288106          9         13         14         12          7
-    ## ENSG00000288107          0          2          1          0          2
-    ## ENSG00000288108          0          0          0          0          0
-    ## ENSG00000288109          1          0          1          0          0
-    ## ENSG00000288110          0          0          0          0          0
-    ## ENSG00000288111          0          0          0          0          0
-    ##                 SRR1039518 SRR1039519 SRR1039520 SRR1039521 SRR1039522
-    ## ENSG00000288106          9          5          7          3          1
-    ## ENSG00000288107          0          0          0          1          2
-    ## ENSG00000288108          0          0          0          0          0
-    ## ENSG00000288109          0          0          0          0          0
-    ## ENSG00000288110          0          0          0          0          0
-    ## ENSG00000288111          1          0          0          0          0
-    ##                 SRR1039523
-    ## ENSG00000288106          5
-    ## ENSG00000288107          0
-    ## ENSG00000288108          0
-    ## ENSG00000288109          0
-    ## ENSG00000288110          0
-    ## ENSG00000288111          0
+```
 
 If you estimated **transcript-level counts** (rather than **gene-level
 counts** produced by htseq-count) using a method like *RSEM*, *Salmon*,
@@ -216,145 +133,20 @@ We also need to read in the sample annotation (metadata) that we
 downloaded from the SRA, which contains sample labels, experimental
 labels, and sequencing run information, etc.
 
+```r
     # read in the file from the SRA metadata that has sample/experimental labels 
     colData <- read.csv("Day-2/sample_metadata.csv", row.names=1)
     head(colData)
-
-    ##      Sample                                     Experiment.Title Organism.Name
-    ## 2 SRS508568  GSM1275862: N61311_untreated; Homo sapiens; RNA-Seq  Homo sapiens
-    ## 1 SRS508567        GSM1275863: N61311_Dex; Homo sapiens; RNA-Seq  Homo sapiens
-    ## 4 SRS508570        GSM1275864: N61311_Alb; Homo sapiens; RNA-Seq  Homo sapiens
-    ## 3 SRS508569    GSM1275865: N61311_Alb_Dex; Homo sapiens; RNA-Seq  Homo sapiens
-    ## 5 SRS508571 GSM1275866: N052611_untreated; Homo sapiens; RNA-Seq  Homo sapiens
-    ## 6 SRS508572       GSM1275867: N052611_Dex; Homo sapiens; RNA-Seq  Homo sapiens
-    ##            Instrument Submitter Study.Accession
-    ## 2 Illumina HiSeq 2000       GEO       SRP033351
-    ## 1 Illumina HiSeq 2000       GEO       SRP033351
-    ## 4 Illumina HiSeq 2000       GEO       SRP033351
-    ## 3 Illumina HiSeq 2000       GEO       SRP033351
-    ## 5 Illumina HiSeq 2000       GEO       SRP033351
-    ## 6 Illumina HiSeq 2000       GEO       SRP033351
-    ##                                                                          Study.Title
-    ## 2 Human Airway Smooth Muscle Transcriptome Changes in Response to Asthma Medications
-    ## 1 Human Airway Smooth Muscle Transcriptome Changes in Response to Asthma Medications
-    ## 4 Human Airway Smooth Muscle Transcriptome Changes in Response to Asthma Medications
-    ## 3 Human Airway Smooth Muscle Transcriptome Changes in Response to Asthma Medications
-    ## 5 Human Airway Smooth Muscle Transcriptome Changes in Response to Asthma Medications
-    ## 6 Human Airway Smooth Muscle Transcriptome Changes in Response to Asthma Medications
-    ##   Sample.Accession Sample.Title Total.Spots Total.Bases Library.Source
-    ## 2        SRS508568           NA    22935521  2889875646 TRANSCRIPTOMIC
-    ## 1        SRS508567           NA    21155707  2665619082 TRANSCRIPTOMIC
-    ## 4        SRS508570           NA    22852619  2879429994 TRANSCRIPTOMIC
-    ## 3        SRS508569           NA    21938637  2764268262 TRANSCRIPTOMIC
-    ## 5        SRS508571           NA    28136282  3545171532 TRANSCRIPTOMIC
-    ## 6        SRS508572           NA    43356464  3791311776 TRANSCRIPTOMIC
-    ##   Library.Selection ReleaseDate LibrarySelection  LibrarySource LibraryLayout
-    ## 2              cDNA 1/2/14 9:16             cDNA TRANSCRIPTOMIC        PAIRED
-    ## 1              cDNA 1/2/14 9:16             cDNA TRANSCRIPTOMIC        PAIRED
-    ## 4              cDNA 1/2/14 9:16             cDNA TRANSCRIPTOMIC        PAIRED
-    ## 3              cDNA 1/2/14 9:16             cDNA TRANSCRIPTOMIC        PAIRED
-    ## 5              cDNA 1/2/14 9:16             cDNA TRANSCRIPTOMIC        PAIRED
-    ## 6              cDNA 1/2/14 9:16             cDNA TRANSCRIPTOMIC        PAIRED
-    ##   Platform               Model  SRAStudy  BioProject    BioSample SampleType
-    ## 2 ILLUMINA Illumina HiSeq 2000 SRP033351 PRJNA229998 SAMN02422669     simple
-    ## 1 ILLUMINA Illumina HiSeq 2000 SRP033351 PRJNA229998 SAMN02422675     simple
-    ## 4 ILLUMINA Illumina HiSeq 2000 SRP033351 PRJNA229998 SAMN02422668     simple
-    ## 3 ILLUMINA Illumina HiSeq 2000 SRP033351 PRJNA229998 SAMN02422667     simple
-    ## 5 ILLUMINA Illumina HiSeq 2000 SRP033351 PRJNA229998 SAMN02422678     simple
-    ## 6 ILLUMINA Illumina HiSeq 2000 SRP033351 PRJNA229998 SAMN02422670     simple
-    ##   TaxID SampleName CenterName Submission Consent
-    ## 2  9606 GSM1275862        GEO  SRA114259  public
-    ## 1  9606 GSM1275863        GEO  SRA114259  public
-    ## 4  9606 GSM1275864        GEO  SRA114259  public
-    ## 3  9606 GSM1275865        GEO  SRA114259  public
-    ## 5  9606 GSM1275866        GEO  SRA114259  public
-    ## 6  9606 GSM1275867        GEO  SRA114259  public
-    ##                            RunHash                         ReadHash        SRR
-    ## 2 65345B22A4745B616DD5840CF2AD90EE 54B084AA7AD2A02B39D37CBBD5B1C3DC SRR1039508
-    ## 1 E2F5FBD3278F29EC6EA7B00FC95C28B2 294D13FE5364BA88B5FEAD68A53CB11B SRR1039509
-    ## 4 2019240C219172C77646ED066033D588 16F7F5A040CECD58D73F344710F13D7D SRR1039510
-    ## 3 D7FCAEEB12F4F5EE4956EDED736E4E4F 0D8679513EAC88ED62C14B488E2134E5 SRR1039511
-    ## 5 828A997474D0BBD6E5E14DEDB0D9E31D 5834A34CA3CE7EF962A396098543C9E6 SRR1039512
-    ## 6 0EB840FF1F4AA22A5017CB754C039225 5A5DD90EDCD5998A26F7F7BC099D4010 SRR1039513
-    ##       group  tx.group
-    ## 2 untreated untreated
-    ## 1       Dex       Dex
-    ## 4       Alb       Alb
-    ## 3   Alb_Dex   Alb_Dex
-    ## 5 untreated untreated
-    ## 6       Dex       Dex
 
     # order by SRA run accession 
     colData <- colData[order(colData$SRR),]
     # quick look 
     head(colData)
-
-    ##      Sample                                     Experiment.Title Organism.Name
-    ## 2 SRS508568  GSM1275862: N61311_untreated; Homo sapiens; RNA-Seq  Homo sapiens
-    ## 1 SRS508567        GSM1275863: N61311_Dex; Homo sapiens; RNA-Seq  Homo sapiens
-    ## 4 SRS508570        GSM1275864: N61311_Alb; Homo sapiens; RNA-Seq  Homo sapiens
-    ## 3 SRS508569    GSM1275865: N61311_Alb_Dex; Homo sapiens; RNA-Seq  Homo sapiens
-    ## 5 SRS508571 GSM1275866: N052611_untreated; Homo sapiens; RNA-Seq  Homo sapiens
-    ## 6 SRS508572       GSM1275867: N052611_Dex; Homo sapiens; RNA-Seq  Homo sapiens
-    ##            Instrument Submitter Study.Accession
-    ## 2 Illumina HiSeq 2000       GEO       SRP033351
-    ## 1 Illumina HiSeq 2000       GEO       SRP033351
-    ## 4 Illumina HiSeq 2000       GEO       SRP033351
-    ## 3 Illumina HiSeq 2000       GEO       SRP033351
-    ## 5 Illumina HiSeq 2000       GEO       SRP033351
-    ## 6 Illumina HiSeq 2000       GEO       SRP033351
-    ##                                                                          Study.Title
-    ## 2 Human Airway Smooth Muscle Transcriptome Changes in Response to Asthma Medications
-    ## 1 Human Airway Smooth Muscle Transcriptome Changes in Response to Asthma Medications
-    ## 4 Human Airway Smooth Muscle Transcriptome Changes in Response to Asthma Medications
-    ## 3 Human Airway Smooth Muscle Transcriptome Changes in Response to Asthma Medications
-    ## 5 Human Airway Smooth Muscle Transcriptome Changes in Response to Asthma Medications
-    ## 6 Human Airway Smooth Muscle Transcriptome Changes in Response to Asthma Medications
-    ##   Sample.Accession Sample.Title Total.Spots Total.Bases Library.Source
-    ## 2        SRS508568           NA    22935521  2889875646 TRANSCRIPTOMIC
-    ## 1        SRS508567           NA    21155707  2665619082 TRANSCRIPTOMIC
-    ## 4        SRS508570           NA    22852619  2879429994 TRANSCRIPTOMIC
-    ## 3        SRS508569           NA    21938637  2764268262 TRANSCRIPTOMIC
-    ## 5        SRS508571           NA    28136282  3545171532 TRANSCRIPTOMIC
-    ## 6        SRS508572           NA    43356464  3791311776 TRANSCRIPTOMIC
-    ##   Library.Selection ReleaseDate LibrarySelection  LibrarySource LibraryLayout
-    ## 2              cDNA 1/2/14 9:16             cDNA TRANSCRIPTOMIC        PAIRED
-    ## 1              cDNA 1/2/14 9:16             cDNA TRANSCRIPTOMIC        PAIRED
-    ## 4              cDNA 1/2/14 9:16             cDNA TRANSCRIPTOMIC        PAIRED
-    ## 3              cDNA 1/2/14 9:16             cDNA TRANSCRIPTOMIC        PAIRED
-    ## 5              cDNA 1/2/14 9:16             cDNA TRANSCRIPTOMIC        PAIRED
-    ## 6              cDNA 1/2/14 9:16             cDNA TRANSCRIPTOMIC        PAIRED
-    ##   Platform               Model  SRAStudy  BioProject    BioSample SampleType
-    ## 2 ILLUMINA Illumina HiSeq 2000 SRP033351 PRJNA229998 SAMN02422669     simple
-    ## 1 ILLUMINA Illumina HiSeq 2000 SRP033351 PRJNA229998 SAMN02422675     simple
-    ## 4 ILLUMINA Illumina HiSeq 2000 SRP033351 PRJNA229998 SAMN02422668     simple
-    ## 3 ILLUMINA Illumina HiSeq 2000 SRP033351 PRJNA229998 SAMN02422667     simple
-    ## 5 ILLUMINA Illumina HiSeq 2000 SRP033351 PRJNA229998 SAMN02422678     simple
-    ## 6 ILLUMINA Illumina HiSeq 2000 SRP033351 PRJNA229998 SAMN02422670     simple
-    ##   TaxID SampleName CenterName Submission Consent
-    ## 2  9606 GSM1275862        GEO  SRA114259  public
-    ## 1  9606 GSM1275863        GEO  SRA114259  public
-    ## 4  9606 GSM1275864        GEO  SRA114259  public
-    ## 3  9606 GSM1275865        GEO  SRA114259  public
-    ## 5  9606 GSM1275866        GEO  SRA114259  public
-    ## 6  9606 GSM1275867        GEO  SRA114259  public
-    ##                            RunHash                         ReadHash        SRR
-    ## 2 65345B22A4745B616DD5840CF2AD90EE 54B084AA7AD2A02B39D37CBBD5B1C3DC SRR1039508
-    ## 1 E2F5FBD3278F29EC6EA7B00FC95C28B2 294D13FE5364BA88B5FEAD68A53CB11B SRR1039509
-    ## 4 2019240C219172C77646ED066033D588 16F7F5A040CECD58D73F344710F13D7D SRR1039510
-    ## 3 D7FCAEEB12F4F5EE4956EDED736E4E4F 0D8679513EAC88ED62C14B488E2134E5 SRR1039511
-    ## 5 828A997474D0BBD6E5E14DEDB0D9E31D 5834A34CA3CE7EF962A396098543C9E6 SRR1039512
-    ## 6 0EB840FF1F4AA22A5017CB754C039225 5A5DD90EDCD5998A26F7F7BC099D4010 SRR1039513
-    ##       group  tx.group
-    ## 2 untreated untreated
-    ## 1       Dex       Dex
-    ## 4       Alb       Alb
-    ## 3   Alb_Dex   Alb_Dex
-    ## 5 untreated untreated
-    ## 6       Dex       Dex
+```
 
 Lets have a look at our experimental design variable (drug treatment:)
 
+```r
     # now make this a factor as it will be the variable we will use define groups for the differential expression analysis 
     colData$tx.group
 
@@ -362,6 +154,7 @@ Lets have a look at our experimental design variable (drug treatment:)
     ##  [8] Alb_Dex   untreated Dex       Alb       Alb_Dex   untreated Dex      
     ## [15] Alb       Alb_Dex  
     ## Levels: Alb Alb_Dex Dex untreated
+```
 
 It is important that we make this variable a (`factor`) class variable,
 with the reference group set as the variable we want to be considered
@@ -369,8 +162,9 @@ baseline expression. This has already been done for us, however if it
 had not, you can create an ordered factor variable from a character
 string in R using:
 
+```r
     colData$tx.group <- factor(colData$tx.group, levels=c("untreated", "Dex", "Alb", "Alb_Dex"))
-
+```
 ------------------------------------------------------------------------
 
 ### Construct the *DESeq2* data set & explore the characteristics of the data
@@ -389,9 +183,11 @@ Three elements are required to generate the `DESeqDataSet`:
 
 Lets create the `DESeqDataSet` object.
 
+```r
     dds <- DESeqDataSetFromMatrix(countData = cts,
                                   colData = colData,
                                   design = ~ tx.group)
+```
 
 We could have also done this using the `DESeqDataSetFromHTSeqCount()`
 function by specifying a `SampleTable` that includes the path to the
@@ -401,6 +197,7 @@ file, we can just load the dataset directly.
 Before moving on, lets explore our DESeq2 class object a bit to get to
 familar with its contents.
 
+```r
     # have a quick look at the object 
     dds
     # print structure 
@@ -410,22 +207,27 @@ familar with its contents.
     head(colData(dds))
     # specific slots can also be accessed using the '@'
     dds@colData
+```
 
 Lets drop genes that have less than 10 reads across all samples, as
 there just isn’t enough information for these genes to fit robust
 statistical models to.
 
+```r
     # drop genes with low counts 
     keep <- rowSums(counts(dds)) >= 10
     dds <- dds[keep,]
     dim(dds)
 
     ## [1] 24419    16
+```
 
 Lets also save the DESeq object at this point (so that we don’t have to
 do the above everytime we want to work with our data).
 
+```r
     save(dds, file = "DESeq2.rdata")
+```
 
 ------------------------------------------------------------------------
 
@@ -452,7 +254,7 @@ variation in sequencing depth, we might conclude some genes are
 expressed at greater levels in a sample that has simply been sequenced
 to a higher depth.
 
-![](figures/library_size.png)
+![](../figures/library_size.png)
 
 #### Library composition
 
@@ -466,7 +268,7 @@ making it appear that these other genes are expressed at lower levels
 than in sample 2, however this is simply an artifact of library
 composition differences between the samples.
 
-![](figures/library_composition.png)
+![](../figures/library_composition.png)
 
 To correct for **library size** AND **library composition**, DESeq2 uses
 a algorithm referred to as the **median-of-ratios** method. Although we
@@ -492,7 +294,9 @@ our (`DESeqDataset`) object. DESeq2 uses the function
 (`estimateSizeFactors()`) to perform this algorithm and calculate size
 factors for each sample. Lets do this for our (`DESeqDataset`).
 
+```r
     dds <- estimateSizeFactors(dds)
+```
 
 Note: [This video](https://www.youtube.com/watch?v=UFB993xufUU) from
 StatQuest provides an excellent summary of the steps performed by
@@ -502,93 +306,31 @@ Once we have calculated the size factors, it can be helpful to look at
 their distribution to get a feel for how they vary and how much
 normalization between the samples is required.
 
+```r
     sizeFactors(dds)
-
-    ## SRR1039508 SRR1039509 SRR1039510 SRR1039511 SRR1039512 SRR1039513 SRR1039514 
-    ##  0.9546639  0.8379264  0.9559347  0.8841828  1.1063105  0.6305985  1.5002929 
-    ## SRR1039515 SRR1039516 SRR1039517 SRR1039518 SRR1039519 SRR1039520 SRR1039521 
-    ##  0.9404767  1.1086740  1.3092383  1.1900257  0.8972838  0.8647837  0.8868375 
-    ## SRR1039522 SRR1039523 
-    ##  1.1550681  1.2038272
 
     hist(sizeFactors(dds), 
          breaks=6, col = "cornflowerblue",
          xlab="Size factors", ylab="No. of samples", 
          main= "Size factor distribution over samples")
-
-<img src="Untitled_files/figure-markdown_strict/unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
+```
 
 After we have calculated the size factors, we can use the `counts()`
 function, with `normalized` set to `TRUE`), to return the matrix of
 counts where each column (each library/sample) have been divided by the
 size factors calculated by the `estimateSizeFactors()` function.
 
+```r
     counts_norm <- counts(dds, normalized=TRUE)
     head(counts_norm)
-
-    ##                 SRR1039508 SRR1039509 SRR1039510 SRR1039511 SRR1039512
-    ## ENSG00000000003  731.14734  558.52161   792.9412   532.6952  807.18751
-    ## ENSG00000000419  486.03491  605.06508   475.9739   588.1136  549.57447
-    ## ENSG00000000457  270.25217  245.84498   247.9249   256.7342  236.82321
-    ## ENSG00000000460   60.75436   65.63822    92.0565    64.4663   35.25231
-    ## ENSG00000000971 3048.19305 3935.90655  3595.4340  4330.5522 5038.36860
-    ## ENSG00000001036 1465.43714 1243.54597  1450.9360  1104.9751 1528.50400
-    ##                 SRR1039513 SRR1039514 SRR1039515 SRR1039516 SRR1039517
-    ## ENSG00000000003  666.03391  656.53845  933.56907 1064.33448  820.32433
-    ## ENSG00000000419  566.12882  579.22022  475.29086  523.14746  596.53008
-    ## ENSG00000000457  258.48459  218.62397  230.73404  218.27877  252.05496
-    ## ENSG00000000460   55.50283   57.98868   49.97465   69.45233   48.88339
-    ## ENSG00000000971 6041.87900 7435.21467 6154.32548 5468.69486 7524.22254
-    ## ENSG00000001036 1368.54110 1240.42443 1601.31551 1259.16181 1070.85169
-    ##                 SRR1039518 SRR1039519 SRR1039520 SRR1039521 SRR1039522
-    ## ENSG00000000003  936.11422  1271.6156  927.39954  670.92334  973.96853
-    ## ENSG00000000419  602.50799   568.3821  478.73243  563.80113  463.17614
-    ## ENSG00000000457  247.05348   221.7805  265.96246  258.22092  214.70595
-    ## ENSG00000000460   55.46099    74.6698   87.88325   67.65614   72.72298
-    ## ENSG00000000971 8363.68479  6652.2991 5330.81279 8039.80410 6509.57275
-    ## ENSG00000001036 1052.91842  1292.7906 1535.64412 1223.44845 1523.71965
-    ##                 SRR1039523
-    ## ENSG00000000003  724.35645
-    ## ENSG00000000419  559.05033
-    ## ENSG00000000457  230.09947
-    ## ENSG00000000460   75.59224
-    ## ENSG00000000971 7908.94239
-    ## ENSG00000001036 1145.51324
-
+```
+   
 Comparing the normalized to the raw counts, we can clearly see that they
 are different.
 
+```r
     head(counts(dds, normalized=FALSE))
-
-    ##                 SRR1039508 SRR1039509 SRR1039510 SRR1039511 SRR1039512
-    ## ENSG00000000003        698        468        758        471        893
-    ## ENSG00000000419        464        507        455        520        608
-    ## ENSG00000000457        258        206        237        227        262
-    ## ENSG00000000460         58         55         88         57         39
-    ## ENSG00000000971       2910       3298       3437       3829       5574
-    ## ENSG00000001036       1399       1042       1387        977       1691
-    ##                 SRR1039513 SRR1039514 SRR1039515 SRR1039516 SRR1039517
-    ## ENSG00000000003        420        985        878       1180       1074
-    ## ENSG00000000419        357        869        447        580        781
-    ## ENSG00000000457        163        328        217        242        330
-    ## ENSG00000000460         35         87         47         77         64
-    ## ENSG00000000971       3810      11155       5788       6063       9851
-    ## ENSG00000001036        863       1861       1506       1396       1402
-    ##                 SRR1039518 SRR1039519 SRR1039520 SRR1039521 SRR1039522
-    ## ENSG00000000003       1114       1141        802        595       1125
-    ## ENSG00000000419        717        510        414        500        535
-    ## ENSG00000000457        294        199        230        229        248
-    ## ENSG00000000460         66         67         76         60         84
-    ## ENSG00000000971       9953       5969       4610       7130       7519
-    ## ENSG00000001036       1253       1160       1328       1085       1760
-    ##                 SRR1039523
-    ## ENSG00000000003        872
-    ## ENSG00000000419        673
-    ## ENSG00000000457        277
-    ## ENSG00000000460         91
-    ## ENSG00000000971       9521
-    ## ENSG00000001036       1379
-
+```
 We can use this table of normalized read counts to compare values for
 individual genes across samples. We might want to use this to (sanity)
 check the expression of a few genes of interest, before we actually do
@@ -596,6 +338,7 @@ any statistical modelling. The abstract of the paper describes *DUSP1*,
 a phosphatase with dual specificity for tyrosine and threonine, as a
 well-known glucocorticoid-responsive gene.
 
+```r
     # lets make a function to generate a quick plot of the normalized counts 
     gene_plot <- function(ENSG, gene_symbol){
       # save the normalized counts in a dataframe 
@@ -613,8 +356,7 @@ well-known glucocorticoid-responsive gene.
     }
     # now apply the function to print a plot for a specified gene 
     gene_plot(ENSG = "ENSG00000120129", gene_symbol = "DUSP1")
-
-<img src="Untitled_files/figure-markdown_strict/unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
+```
 
 DUSP1 expression is consistently higher in the DEX samples than the
 untreated, suggesting this gene is differentially expressed after DEX
@@ -643,7 +385,7 @@ explains why it is better to use TPM if you need to correct for
 **library size** AND **gene length**.
 
 <center>
-![](figures/gene_length.png)
+![](../figures/gene_length.png)
 </center>
 
 ------------------------------------------------------------------------
@@ -681,8 +423,9 @@ between the samples than PC2. If we plot PC1 against PC2, samples will
 and be further away from samples with more distant expression profiles.
 
 <center>
-![](figures/pca_example.png)
+![](../figures/pca_example.png)
 </center>
+
 Again, StatQuest has an excellent
 [video](https://www.youtube.com/watch?v=_UVHneBUBW0) that explains the
 fundamental concepts of PCA, and provoides more details how to the PCs
@@ -704,48 +447,21 @@ For this analysis, we will use the rlog, which produces values on the
 log2 scale that are also normalized for library size during the rlog
 procedure. Lets perform the rlog transformation on our data.
 
+```r
     rld <- rlog(dds, blind = FALSE)
     head(assay(rld))
-
-    ##                 SRR1039508 SRR1039509 SRR1039510 SRR1039511 SRR1039512
-    ## ENSG00000000003   9.553915   9.293960   9.634062   9.248913   9.651762
-    ## ENSG00000000419   8.975079   9.189020   8.954938   9.161026   9.094500
-    ## ENSG00000000457   8.020479   7.932336   7.940192   7.972483   7.897862
-    ## ENSG00000000460   5.957300   6.012633   6.272144   5.999742   5.602442
-    ## ENSG00000000971  11.859681  12.108263  12.019403  12.202862  12.354590
-    ## ENSG00000001036  10.468316  10.302750  10.458210  10.185346  10.511347
-    ##                 SRR1039513 SRR1039514 SRR1039515 SRR1039516 SRR1039517
-    ## ENSG00000000003   9.463634   9.448013   9.797468   9.930933   9.667877
-    ## ENSG00000000419   9.123299   9.146374   8.953586   9.046305   9.175449
-    ## ENSG00000000457   7.978110   7.824048   7.874069   7.823220   7.955786
-    ## ENSG00000000460   5.898212   5.922434   5.823606   6.055080   5.804083
-    ## ENSG00000000971  12.539505  12.754418  12.558474  12.437680  12.766821
-    ## ENSG00000001036  10.398871  10.300084  10.558848  10.315172  10.153987
-    ##                 SRR1039518 SRR1039519 SRR1039520 SRR1039521 SRR1039522
-    ## ENSG00000000003   9.800475  10.113804   9.790676   9.469947   9.840594
-    ## ENSG00000000419   9.185251   9.127448   8.960671   9.119496   8.928404
-    ## ENSG00000000457   7.937042   7.838148   8.005290   7.977851   7.808157
-    ## ENSG00000000460   5.891935   6.108145   6.233475   6.034777   6.090024
-    ## ENSG00000000971  12.877758  12.638696  12.411750  12.836135  12.616315
-    ## ENSG00000001036  10.137456  10.341643  10.515925  10.286453  10.508171
-    ##                 SRR1039523
-    ## ENSG00000000003   9.544554
-    ## ENSG00000000419   9.111313
-    ## ENSG00000000457   7.871274
-    ## ENSG00000000460   6.119933
-    ## ENSG00000000971  12.819004
-    ## ENSG00000001036  10.220749
+```
 
 We can illustrate the benefit of using the rlog over standard log
 transformation (+ a pseudo-count for genes with 0 counts where the log
 of 0 is infinity) by comparing the transformed values for two samples
 against each other.
 
+```r
     par(mfrow=c(1,2))
     plot(log2(cts[,1]+1), log2(cts[,2]+1), col = "cornflowerblue", xlab = "Sample 1", ylab = "Sample 2", main = "Log2 + 1")
     plot(assay(rld)[,1], assay(rld)[,2], col = "indianred", xlab = "Sample 1", ylab = "Sample 2", main = "rlog")
-
-<img src="Untitled_files/figure-markdown_strict/unnamed-chunk-16-1.png" style="display: block; margin: auto;" />
+```
 
 We can use these transformed values to investigate how many features
 (genes) in our dataset exhibit variability across samples. This is
@@ -753,19 +469,20 @@ useful to know as we only want to use variable features for PCA. Genes
 that don’t explain any variation in the dataset aren’t useful for
 helping us explore differences between the samples.
 
+```r
     # calculate gene expression level variance between samples 
     var <- rev(rowVars(assay(rld))[order(rowVars(assay(rld)))])
     # plot variance for genes accross samples
     plot(var, las = 1, main="Sample gene expression variance", xlab = "Gene", ylab = "Variance")
     abline(v=1000, col="red") ; abline(v=500, col="green") ; abline(v=250, col="blue")
-
-<img src="Untitled_files/figure-markdown_strict/unnamed-chunk-17-1.png" style="display: block; margin: auto;" />
+```
 
 At around 500 the variance starts to spike upwards, so this is the
 number of variable features (genes) to use. Lets restrict the dataset to
 500 genes for purposes of the PCA. Now lets extract and visualize the
 variance explained by each PC to determine which are most informative.
 
+```r
     # modify variable feature number to be used in PCA and hierachical clutering based on no. of most variable features 
     var_feature_n <- 500 
     # perform PCA and order by variance 
@@ -778,14 +495,15 @@ variance explained by each PC to determine which are most informative.
     percentVar <- percentVar[1:5]
     # plot variance for top 10 PCs 
     barplot(percentVar[1:5], col = "indianred", las = 1, ylab = "% Variance", cex.lab = 1.2)
+```
 
-<img src="Untitled_files/figure-markdown_strict/unnamed-chunk-18-1.png" style="display: block; margin: auto;" />
 We can see that the majority of variance is explained by the first few
 PCs, therefore visualizing where samples fall along these PCs will be
 the most informative way to identify major differences between them,
 based on their gene expression profiles. Lets generate a PCA plot for
 PC1 vs PC2.
 
+```r
     # construct data frame w/ PC loadings and add sample labels 
     pca_df <- as.data.frame(pca$x)
     pca_df$tx.group <- dds@colData$tx.group
@@ -805,8 +523,7 @@ PC1 vs PC2.
          panel.first = grid(),
          col=pca_df$col)
     text((pca_df[, 2])~(pca_df[, 1]), labels = pca_df$tx.group, cex=0.6, font=2, pos=4)
-
-<img src="Untitled_files/figure-markdown_strict/unnamed-chunk-19-1.png" style="display: block; margin: auto;" />
+```
 
 Looking at the plot, we can see some clear clustering by treatment group
 for some of the samples. For example, **untreated** samples appear to
@@ -847,6 +564,7 @@ the batch effect, rather than our biological factor of interest
 (treatment group). For purposes of this example, lets create a fake
 variable for sample batch, and include this on the PCA plot.
 
+```r
     pca_df$batch <- NA
     pca_df$batch[pca_df$PC2 < 10] <- "Batch 1"
     pca_df$batch[pca_df$PC2 > 10] <- "Batch 2"
@@ -866,8 +584,7 @@ variable for sample batch, and include this on the PCA plot.
     legend(9.5, 10.5, levels(pca_df$batch), pch = c(16, 2))
     legend(1.5, 11.5, levels(pca_df$tx.group), pch = 16, col = pca_df$col)
     text((pca_df[, 2])~(pca_df[, 1]), labels = pca_df$tx.group, cex=0.6, font=2, pos=4)
-
-<img src="Untitled_files/figure-markdown_strict/unnamed-chunk-20-1.png" style="display: block; margin: auto;" />
+```
 
 If this was a real batch variable, this would clearly indicate a batch
 effect. If batch effects are not accounted for in the differential
@@ -915,8 +632,9 @@ that change in a similar way across our samples, and may share some
 common function of interest.
 
 <center>
-![](figures/heatmaps.png)
+![](../figures/heatmaps.png)
 </center>
+
 The first step in a hierachical clustering analaysis is to *scale your
 data*. This means that expression levels are all transformed onto the
 same scale before clustering. This is important to do as we can only
@@ -939,6 +657,7 @@ transformed data** and the **500 most variable features**, as features
 that do not vary across samples are not informative for dimension
 reduction appraoches.
 
+```r
     # select top X no. of variable genes 
     topVarGenes <- head(order(rowVars(assay(rld)), decreasing=TRUE), var_feature_n)
     # set up gene expression matrix 
@@ -967,13 +686,13 @@ reduction appraoches.
                   show_row_names = FALSE)
     # plot the heatmap 
     draw(ht1, row_title = "Genes", column_title = "Top 500 most variable genes")
-
-<img src="Untitled_files/figure-markdown_strict/unnamed-chunk-21-1.png" style="display: block; margin: auto;" />
+```
 
 As we saw in the PCA, the Alb and co-treated samples do not form any
 clear clusters. We may want to remove them and perform the clustering
 again so that we can compare the untreated and Dex samples more easily.
 
+```r
     ind_to_keep <- c(which(colData(rld)$group=="untreated"), which(colData(rld)$group=="Dex"))
     topVarGenes <- head(order(rowVars(assay(rld)[,ind_to_keep]), decreasing=TRUE), var_feature_n)
     # set up gene expression matrix 
@@ -1001,8 +720,7 @@ again so that we can compare the untreated and Dex samples more easily.
                   show_row_names = FALSE)
     # plot the heatmap 
     draw(ht1, row_title = "Genes", column_title = "Top 500 most variable genes")
-
-<img src="Untitled_files/figure-markdown_strict/unnamed-chunk-22-1.png" style="display: block; margin: auto;" />
+```
 
 There does indeed seem to be relatively good clustering between
 untreated and Dex samples, suggesting there are unique gene expression
@@ -1013,19 +731,17 @@ clustered away from the other Dex treated samples on the PCA. We can add
 an annotation bar for the fake batch effect we created earlier to this
 plot to confirm this.
 
+```r
     # which samples had values > 10 for PC2 
     pca_df$sample_ids[pca_df$PC2 > 10 & pca_df$tx.group=="untreated"]
 
-    ## [1] "SRR1039516"
-
     pca_df$sample_ids[pca_df$PC2 > 10 & pca_df$tx.group=="Dex"]
-
-    ## [1] "SRR1039517"
 
     # set the batch variable for these samples as batch 2
     colData_sub$batch <- "Batch 1"
     colData_sub$batch[colData_sub$SRR=="SRR1039516"] <- "Batch 2"
     colData_sub$batch[colData_sub$SRR=="SRR1039517"] <- "Batch 2"
+
     # set up annotation bar for samples 
     ha1 = HeatmapAnnotation(group = c(as.character(colData_sub$tx.group)), 
                             batch = c(as.character(colData_sub$batch)),
@@ -1039,8 +755,7 @@ plot to confirm this.
                   show_row_names = FALSE)
     # plot the heatmap 
     draw(ht2, row_title = "Genes", column_title = "Top 500 most variable genes")
-
-<img src="Untitled_files/figure-markdown_strict/unnamed-chunk-23-1.png" style="display: block; margin: auto;" />
+```
 
 Based on our newly labeled plot it does seem that these 2 samples are
 outliers based on the hierachical clustering, which would support the
@@ -1058,72 +773,6 @@ perform the differential expression analysis.
 
 Session Information
 -------------------
-
+```r
     sessionInfo()
-
-    ## R version 3.6.2 (2019-12-12)
-    ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-    ## Running under: macOS Catalina 10.15.7
-    ## 
-    ## Matrix products: default
-    ## BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
-    ## LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
-    ## 
-    ## locale:
-    ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
-    ## 
-    ## attached base packages:
-    ##  [1] grid      parallel  stats4    stats     graphics  grDevices utils    
-    ##  [8] datasets  methods   base     
-    ## 
-    ## other attached packages:
-    ##  [1] kableExtra_1.3.4            xtable_1.8-4               
-    ##  [3] circlize_0.4.12             ComplexHeatmap_2.2.0       
-    ##  [5] RColorBrewer_1.1-2          gplots_3.1.1               
-    ##  [7] pheatmap_1.0.12             vsn_3.54.0                 
-    ##  [9] biomaRt_2.42.1              DESeq2_1.26.0              
-    ## [11] SummarizedExperiment_1.16.1 DelayedArray_0.12.3        
-    ## [13] BiocParallel_1.20.1         matrixStats_0.58.0         
-    ## [15] Biobase_2.46.0              GenomicRanges_1.38.0       
-    ## [17] GenomeInfoDb_1.22.1         IRanges_2.20.2             
-    ## [19] S4Vectors_0.24.4            BiocGenerics_0.32.0        
-    ## [21] tximport_1.14.2             ggplot2_3.3.3              
-    ## [23] dplyr_1.0.6                
-    ## 
-    ## loaded via a namespace (and not attached):
-    ##   [1] colorspace_2.0-1       rjson_0.2.20           ellipsis_0.3.2        
-    ##   [4] htmlTable_2.2.1        XVector_0.26.0         GlobalOptions_0.1.2   
-    ##   [7] base64enc_0.1-3        clue_0.3-59            rstudioapi_0.13       
-    ##  [10] farver_2.1.0           affyio_1.56.0          bit64_4.0.5           
-    ##  [13] AnnotationDbi_1.48.0   fansi_0.4.2            xml2_1.3.2            
-    ##  [16] splines_3.6.2          cachem_1.0.5           geneplotter_1.64.0    
-    ##  [19] knitr_1.33             Formula_1.2-4          annotate_1.64.0       
-    ##  [22] cluster_2.1.2          dbplyr_2.1.1           png_0.1-7             
-    ##  [25] BiocManager_1.30.15    compiler_3.6.2         httr_1.4.2            
-    ##  [28] backports_1.2.1        assertthat_0.2.1       Matrix_1.3-3          
-    ##  [31] fastmap_1.1.0          limma_3.42.2           htmltools_0.5.1.1     
-    ##  [34] prettyunits_1.1.1      tools_3.6.2            gtable_0.3.0          
-    ##  [37] glue_1.4.2             GenomeInfoDbData_1.2.2 affy_1.64.0           
-    ##  [40] rappdirs_0.3.3         Rcpp_1.0.6             vctrs_0.3.8           
-    ##  [43] svglite_2.0.0          preprocessCore_1.48.0  xfun_0.23             
-    ##  [46] stringr_1.4.0          rvest_1.0.0            lifecycle_1.0.0       
-    ##  [49] gtools_3.8.2           XML_3.99-0.3           zlibbioc_1.32.0       
-    ##  [52] scales_1.1.1           hms_1.1.0              yaml_2.2.1            
-    ##  [55] curl_4.3.1             memoise_2.0.0          gridExtra_2.3         
-    ##  [58] rpart_4.1-15           latticeExtra_0.6-29    stringi_1.6.2         
-    ##  [61] RSQLite_2.2.7          highr_0.9              genefilter_1.68.0     
-    ##  [64] checkmate_2.0.0        caTools_1.18.2         shape_1.4.5           
-    ##  [67] systemfonts_1.0.2      rlang_0.4.11           pkgconfig_2.0.3       
-    ##  [70] bitops_1.0-7           evaluate_0.14          lattice_0.20-44       
-    ##  [73] purrr_0.3.4            labeling_0.4.2         htmlwidgets_1.5.3     
-    ##  [76] bit_4.0.4              tidyselect_1.1.1       magrittr_2.0.1        
-    ##  [79] R6_2.5.0               generics_0.1.0         Hmisc_4.5-0           
-    ##  [82] DBI_1.1.1              pillar_1.6.1           foreign_0.8-76        
-    ##  [85] withr_2.4.2            survival_3.2-11        RCurl_1.98-1.3        
-    ##  [88] nnet_7.3-16            tibble_3.1.2           crayon_1.4.1          
-    ##  [91] KernSmooth_2.23-20     utf8_1.2.1             BiocFileCache_1.10.2  
-    ##  [94] rmarkdown_2.8          GetoptLong_1.0.5       jpeg_0.1-8.1          
-    ##  [97] progress_1.2.2         locfit_1.5-9.4         data.table_1.14.0     
-    ## [100] blob_1.2.1             webshot_0.5.2          digest_0.6.27         
-    ## [103] openssl_1.4.4          munsell_0.5.0          viridisLite_0.4.0     
-    ## [106] askpass_1.1
+```
