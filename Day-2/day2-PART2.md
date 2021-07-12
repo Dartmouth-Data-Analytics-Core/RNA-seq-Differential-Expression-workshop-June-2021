@@ -19,10 +19,13 @@ images, to the directory on your computer!!
 </center>
 Set the root directory for the whole markdown
 
+```r
     knitr::opts_knit$set(root.dir = '/Users/shannon/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/')
+```
 
 Lets start by loading the required libraries again.
 
+```r
     library(tximport)
     library(DESeq2)
     library(biomaRt)
@@ -38,12 +41,14 @@ Lets start by loading the required libraries again.
     library(apeglm)
     library(xtable)
     library(kableExtra)
+```
 
 Read in the DESeq2 dataset we created in PART-1, which contains the raw
 counts, normalization factors, and sample metadata.
 
+```r
     load("Day-2/DESeq2.rdata")
-
+```
 ------------------------------------------------------------------------
 
 ### Apply the DESeq2 procedure to the data
@@ -61,30 +66,20 @@ wald statistics for differential expression testing (`nbinomWaldTest`)
 
 Lets run `DESeq2` on our dataset:
 
+```r
     # run the DEseq2 analysis 
     dds <- DESeq(dds)
-
-    ## estimating size factors
-
-    ## estimating dispersions
-
-    ## gene-wise dispersion estimates
-
-    ## mean-dispersion relationship
-
-    ## final dispersion estimates
-
-    ## fitting model and testing
+```
 
 Before running the differential expression analysis, lets have a look at
 some of the standard characteristics of RNA-seq data. The first and most
 obvious thing to do is look at how the distribution of the raw counts.
 
+```r
     hist(counts(dds, normalized=FALSE)[,5], breaks = 500, col="blue",
          xlab="Raw expression counts", ylab="Number of genes",
          main = "Count distribution for sample X")
-
-<img src="day2-PART2_files/figure-markdown_strict/unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
+```
 
 Perhaps the most obvious feature of this distribution is the large
 number of genes with very low count values. This occurs as there are
@@ -102,36 +97,9 @@ again at the matrix of raw counts, it is actually clear that RNA-seq is
 integer count data, therefore we should use a statistical model for
 count-based data.
 
+```r
     head(counts(dds, normalized=FALSE))
-
-    ##                 SRR1039508 SRR1039509 SRR1039510 SRR1039511 SRR1039512
-    ## ENSG00000000003        698        468        758        471        893
-    ## ENSG00000000419        464        507        455        520        608
-    ## ENSG00000000457        258        206        237        227        262
-    ## ENSG00000000460         58         55         88         57         39
-    ## ENSG00000000971       2910       3298       3437       3829       5574
-    ## ENSG00000001036       1399       1042       1387        977       1691
-    ##                 SRR1039513 SRR1039514 SRR1039515 SRR1039516 SRR1039517
-    ## ENSG00000000003        420        985        878       1180       1074
-    ## ENSG00000000419        357        869        447        580        781
-    ## ENSG00000000457        163        328        217        242        330
-    ## ENSG00000000460         35         87         47         77         64
-    ## ENSG00000000971       3810      11155       5788       6063       9851
-    ## ENSG00000001036        863       1861       1506       1396       1402
-    ##                 SRR1039518 SRR1039519 SRR1039520 SRR1039521 SRR1039522
-    ## ENSG00000000003       1114       1141        802        595       1125
-    ## ENSG00000000419        717        510        414        500        535
-    ## ENSG00000000457        294        199        230        229        248
-    ## ENSG00000000460         66         67         76         60         84
-    ## ENSG00000000971       9953       5969       4610       7130       7519
-    ## ENSG00000001036       1253       1160       1328       1085       1760
-    ##                 SRR1039523
-    ## ENSG00000000003        872
-    ## ENSG00000000419        673
-    ## ENSG00000000457        277
-    ## ENSG00000000460         91
-    ## ENSG00000000971       9521
-    ## ENSG00000001036       1379
+```
 
 At this point it might be useful to define a few terms that are really
 important to know in order to understand as we fit statistical models to
@@ -151,6 +119,7 @@ of observations generally exceeds the mean of those observations. We can
 visualize overdispersion in RNA-seq data by plotting the mean-variance
 relationship for a group of replicates in our data.
 
+```r
     # calculate mean and varaince for group of replicates
     mean_counts <- apply(counts(dds, normalized=FALSE)[,1:3], 1, mean)
     variance_counts <- apply(counts(dds, normalized=FALSE)[,1:3], 1, var)
@@ -163,8 +132,7 @@ relationship for a group of replicates in our data.
 
     # add line for x=y
     abline(0,1,lwd=2,col="red")
-
-![](day2-PART2_files/figure-markdown_strict/unnamed-chunk-6-1.png)
+```
 
 **We can clearly see a few features of the mean variance trend from this
 plot:** 1. The data does not fall along the x = y line, as it would if
@@ -186,6 +154,7 @@ gene you are observing**.
 We can plot a few different NB distributions to examine how the
 dispersion parameter affects the spread of the data.
 
+```r
     # generate a random varaible using the negative binomial distribution
     ### dispersion = 10
     par(mfrow=c(3,1))
@@ -200,8 +169,7 @@ dispersion parameter affects the spread of the data.
     hist(rnbinom(n = 10000, mu = 100, size = 1/0.1), 
          xlim = c(0, 300), xlab = "", breaks = 500, 
          main = " Dispersion 0.1")
-
-<img src="day2-PART2_files/figure-markdown_strict/unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
+```
 
 Note: The above example for plotting NB distributions at various
 disperions was adapted from the *Data Analysis for the Life Sciences
@@ -244,10 +212,9 @@ toward the prior mean are:**
 replicates!)  
 2. how far the inital dispersion is from the prior mean
 
-<center>
-![DEseq2 dispersion
-estimation](/Users/shannon/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/figures/dispersion_estimation.png)
-</center>
+![DEseq2 dispersion estimation](../figures/dispersion_estimation.png)
+
+
 This Figure taken frm the `DESeq2` paper demonstrates the process of
 *shrinkage*, where the inital dispersion esimates for each gene
 (estimated by maximum-likelihood) are shrunken towards the *prior mean*
@@ -265,9 +232,9 @@ our data, and therefore if it can be used to accurately test DE.
 
 **We can plot the dispersion estimates for our own data using:**
 
+```r
     plotDispEsts(dds)
-
-<img src="day2-PART2_files/figure-markdown_strict/unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
+```
 
 This is an example of a well calibrated set of dispersion estimates due
 to these two features: the final MAP estimates are well scattered around
@@ -305,9 +272,9 @@ Since we are need to model our counts using the negative-binomial
 distribution, the GLM we will fit is of the NB family of GLMs.
 
 **The DESeq2 model:**
-</center>
-![](/Users/shannon/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/figures/neg-binom.png)
-</center>
+
+![](../figures/neg-binom.png)
+
 In order to fit the GLM, we need the **mean count of each gene** across
 the samples in each experimental group, and the **dispersion of that
 gene** in those groups. The mean count is a combination of the expected
@@ -349,6 +316,7 @@ do is tell DESeq2 which results we want to look at, which can be done
 using the `results()` function, and specifying the coefficients that we
 want by using the `names` agument.
 
+```r
     # quickly check the available coefficients we could extract 
     resultsNames(dds)
 
@@ -360,6 +328,7 @@ want by using the `names` agument.
       name = "group_Dex_vs_untreated", 
       alpha = 0.05, 
       lfcThreshold = 0)
+```
 
 **A couple of things to note here:**
 
@@ -405,9 +374,11 @@ calculating the fold change, and the second group is used as the
 denominator, therefore the second group is used as the baseline for the
 comparison.
 
+```r
     res <- results(dds, alpha = 0.05, 
       contrast = c("group", "Dex", "untreated"), 
       lfcThreshold = 0)
+```
 
 This is useful when we have multiple levels in the experimental design
 variable and we wish to extract coefficients for the results from
@@ -418,30 +389,25 @@ that are discussed in the DESeq2 documentation.
 **Lets have a quick look at the results and how many genes were
 statistically significant at an adjusted P-value threshold of 0.05. **
 
+```r
     # order by adj Pval 
     res_ord <- res[order(res$padj),] 
 
     # quick check for how many DEGs with significance @ 5% level in either FC direction 
     sum(res$padj < 0.05, na.rm=TRUE)
 
-    ## [1] 1673
-
     sum(res$padj < 0.05 & res$log2FoldChange>2, na.rm=TRUE)
-
-    ## [1] 102
 
     sum(res$padj < 0.05 & res$log2FoldChange < -2, na.rm=TRUE)
 
-    ## [1] 71
+```  
 
 You may have noticed I am using `na.rm=TRUE` in the `sum()` function
 above. Why might this be?
 
+```r
     table(is.na(res$padj))
-
-    ## 
-    ## FALSE  TRUE 
-    ## 14918  9501
+```
 
 This is not a mistake, but rather part of a deliberate filtering process
 conducted by `DESeq2`, in order to flag genes that have little or no
@@ -468,18 +434,20 @@ count value DESeq2 chose to filter results for. Any genes with a mean
 expression value below this line will have their `padj` values set to
 NA, and discarded during multiple testing correction.
 
+```r
     plot(metadata(res_ord)$filterNumRej, 
          type="b", ylab="number of rejections",
          xlab="quantiles of filter (mean norm. counts)")
     lines(metadata(res_ord)$lo.fit, col="red")
     abline(v=metadata(res_ord)$filterTheta)
-
-<img src="day2-PART2_files/figure-markdown_strict/unnamed-chunk-13-1.png" style="display: block; margin: auto;" />
+```
 
 Its worth removing these results with NAs before moving forward to make
 our lives a little easier when handling the adjusted P-values.
 
+```r
     res_ord <- res_ord[!is.na(res_ord$padj),]
+```
 
 ### Add gene annotation to the results
 
@@ -490,128 +458,54 @@ annotate these results. We can obtain this for our species of interest
 in a flat file format using the [BioMart on the Ensembl
 website](http://uswest.ensembl.org/biomart/martview/b0399bb192186dea3aedf87d82a4580c).
 
+```r
     # read in the flat file we downloaded and have a look at it 
     anno <- read.delim("Day-2/GRCh38.p12_ensembl-97.txt", stringsAsFactors = T, header = T)
     anno <- anno[order(anno$Chromosome.scaffold.name),]
     dim(anno)
 
-    ## [1] 66832    10
 
     # have a look at the first few rows 
     head(anno)
-
-    ##     Gene.stable.ID Gene.stable.ID.version Chromosome.scaffold.name
-    ## 47 ENSG00000201900      ENSG00000201900.1                        1
-    ## 60 ENSG00000243173      ENSG00000243173.3                        1
-    ## 66 ENSG00000276103      ENSG00000276103.1                        1
-    ## 67 ENSG00000276470      ENSG00000276470.1                        1
-    ## 75 ENSG00000212257      ENSG00000212257.1                        1
-    ## 84 ENSG00000275823      ENSG00000275823.1                        1
-    ##    Gene.start..bp.
-    ## 47       114727720
-    ## 60       162777730
-    ## 66       150608507
-    ## 67        11843812
-    ## 75        65022968
-    ## 84        63549294
-    ##                                                              Gene.description
-    ## 47                     RNY1 pseudogene 13 [Source:HGNC Symbol;Acc:HGNC:50876]
-    ## 60  RNA, 7SL, cytoplasmic 861, pseudogene [Source:HGNC Symbol;Acc:HGNC:46877]
-    ## 66                                                                           
-    ## 67                                                                           
-    ## 75 RNA, U6 small nuclear 1176, pseudogene [Source:HGNC Symbol;Acc:HGNC:48139]
-    ## 84                                                                           
-    ##    Gene.end..bp. Strand Transcript.count Gene.type  Gene.name
-    ## 47     114727824      1                1  misc_RNA    RNY1P13
-    ## 60     162778014      1                1  misc_RNA  RN7SL861P
-    ## 66     150608623     -1                1     snRNA    RF00015
-    ## 67      11843984      1                1  misc_RNA    RF02156
-    ## 75      65023074     -1                1     snRNA RNU6-1176P
-    ## 84      63549366     -1                1  misc_RNA    RF02107
+```
 
 Lets have a look at the Chromosome distribution of features
 
+```r
     tab1 <- table(anno$Chromosome.scaffold.name)
     tab1[1:22]
-
-    ## 
-    ##    1   10   11   12   13   14   15   16   17   18   19    2   20   21   22    3 
-    ## 5471 2332 3360 3054 1397 2282 2221 2556 3060 1242 2992 4196 1457  872 1384 3185 
-    ##    4    5    6    7    8    9 
-    ## 2651 2983 3059 3014 2482 2327
+```
 
 Lets also quickly check that nothing is duplicated in the ENSG ID column
 of our annotation, as this would cause problems when merging with our
 results.
 
+```r
     any(duplicated(anno$Gene.stable.ID))
-
-    ## [1] FALSE
+```
 
 Now lets add the annotation for each gene name directly to the results.
 
+```r
     # use match() to find corresponding indicies (rows) for each ENSG ID 
     mat1 <- match(rownames(res_ord), anno$Gene.stable.ID)
     table(is.na(mat1))
-
-    ## 
-    ## FALSE 
-    ## 14918
 
     # add gene names to results as a new column 
     res_ord$gene <- as.character(anno$Gene.name[mat1])
     head(res_ord, 20)
 
-    ## log2 fold change (MLE): group Dex vs untreated 
-    ## Wald test p-value: group Dex vs untreated 
-    ## DataFrame with 20 rows and 7 columns
-    ##                         baseMean     log2FoldChange             lfcSE
-    ##                        <numeric>          <numeric>         <numeric>
-    ## ENSG00000179094 879.162412923049    3.1955116536459 0.520089631550247
-    ## ENSG00000109906 427.519588336145     7.102329380743  1.26387280388192
-    ## ENSG00000157613 2837.46444827888 -0.977869256859263 0.188367598351614
-    ## ENSG00000179593 74.1106067372775   9.60746204046761  1.85298907731736
-    ## ENSG00000182010 104.205807294111  -1.89767754411958 0.361015967801541
-    ## ...                          ...                ...               ...
-    ## ENSG00000183160 3003.58826886215  -1.17316952492041 0.242135177240336
-    ## ENSG00000185950 2099.90917446653   2.16736650931075 0.439155979458348
-    ## ENSG00000198517 598.229869113694   0.70436711786436 0.145082798393017
-    ## ENSG00000124151 1605.14338263049   1.39771472406699 0.290457449620042
-    ## ENSG00000152583 1214.50066415466    4.5976490815425 0.961457272963187
-    ##                              stat               pvalue                 padj
-    ##                         <numeric>            <numeric>            <numeric>
-    ## ENSG00000179094  6.14415566047903 8.03899782915565e-10 1.19925769615344e-05
-    ## ENSG00000109906  5.61949696118832 1.91514247454437e-08 0.000142850477176265
-    ## ENSG00000157613  -5.1912816504351 2.08851413522592e-07  0.00064503652440172
-    ## ENSG00000179593  5.18484547916316 2.16194035528127e-07  0.00064503652440172
-    ## ENSG00000182010 -5.25649199307101 1.46829166165317e-07  0.00064503652440172
-    ## ...                           ...                  ...                  ...
-    ## ENSG00000183160 -4.84510155976203 1.26546929480719e-06  0.00109369064101773
-    ## ENSG00000185950  4.93530000885781 8.00276479495294e-07  0.00109369064101773
-    ## ENSG00000198517  4.85493198136619 1.20428072665044e-06  0.00109369064101773
-    ## ENSG00000124151  4.81211525438713  1.4934118349848e-06  0.00117256409233175
-    ## ENSG00000152583  4.78195881484433 1.73595250807773e-06  0.00129484697577518
-    ##                        gene
-    ##                 <character>
-    ## ENSG00000179094  AC129492.1
-    ## ENSG00000109906      ZBTB16
-    ## ENSG00000157613     CREB3L1
-    ## ENSG00000179593     ALOX15B
-    ## ENSG00000182010       RTKN2
-    ## ...                     ...
-    ## ENSG00000183160     TMEM119
-    ## ENSG00000185950        IRS2
-    ## ENSG00000198517        MAFK
-    ## ENSG00000124151       NCOA3
-    ## ENSG00000152583     SPARCL1
+```
 
 Lets also add some other columns that might be of interest to us when
 reviewing the results.
 
+```r
     res_ord$chr <- as.character(anno$Chromosome.scaffold.name[mat1])
     res_ord$start <- as.character(anno$Gene.start..bp.[mat1])
     res_ord$end <- as.character(anno$Gene.end..bp.[mat1])
     res_ord$strand <- as.character(anno$Strand[mat1])
+```
 
 ------------------------------------------------------------------------
 
@@ -639,6 +533,7 @@ The fold-change value of genes with non-significant fold changes is not
 meaningful, as there is not enough statistical confidence in these fold
 changes.
 
+```r
     plot(res$log2FoldChange, -log10(res$pvalue), 
          main = "Volcano plot", 
          las = 1, col = "indianred",
@@ -647,8 +542,7 @@ changes.
     # add horizontal lines to help guide interpretation
     abline(h=-log10(0.05/nrow(res)), lty = 2, col = "black") # Bonferonni 
     abline(h=-log10(0.05), lty = 2, col = "black") # nominal P-value 
-
-<img src="day2-PART2_files/figure-markdown_strict/unnamed-chunk-20-1.png" style="display: block; margin: auto;" />
+```
 
 Here we can clearly see that there are quite a few genes above our
 significance threshold in both the up and downregulation directions (+ve
@@ -665,6 +559,7 @@ more informative. We will use the **ggpolot2** R package to do this, and
 we will color each point based on a combination of fold change and
 P-value, as these determine which genes are of most interest to us.
 
+```r
     # save a dataframe from the results() output
     res_tmp <- as.data.frame(res_ord)
 
@@ -700,7 +595,6 @@ P-value, as these determine which genes are of most interest to us.
           res_tmp$cols[i] <- "gray10" 
         }
     }
-      
 
     res_tmp$ENSG <- rownames(res_tmp)
 
@@ -717,13 +611,12 @@ P-value, as these determine which genes are of most interest to us.
     # print the plot 
     print(p)
 
-    ## Warning: Removed 1 rows containing missing values (geom_point).
-
-<img src="day2-PART2_files/figure-markdown_strict/unnamed-chunk-21-1.png" style="display: block; margin: auto;" />
+```
 
 This is nice, but some labels for potentially interesting genes would be
 useful. Lets add some using the **ggrepel** package.
 
+```r
     p2 <- p + 
       # add labels to genes w/ LFC > 2 and above alpha threshold
       geom_label_repel(data = subset(res_tmp, log2FoldChange > 2 & pvalue < alpha), aes(label = gene), 
@@ -749,12 +642,7 @@ useful. Lets add some using the **ggrepel** package.
 
     # print the plot 
     print(p2)
-
-    ## Warning: Removed 1 rows containing missing values (geom_point).
-
-    ## Warning: Removed 1 rows containing missing values (geom_label_repel).
-
-<img src="day2-PART2_files/figure-markdown_strict/unnamed-chunk-22-1.png" style="display: block; margin: auto;" />
+```
 
 This looks a lot better, and gives us a lot more information than the
 first, very basic plot we generated.
@@ -772,15 +660,15 @@ detect 250 with 5 replicates.
 
 **Save our results to .csv files**
 
+```r
     # subset @ 5% adjusted pval sig. level 
     res_order_FDR_05 <- res_ord[res_ord$padj<0.05,]
     nrow(res_order_FDR_05)
 
-    ## [1] 1673
-
     # write both to csv files
     write.csv(as.data.frame(res_ord), file= "DE_results.csv")
     write.csv(as.data.frame(res_order_FDR_05), file="DE_results.FDR.0.05.csv")
+```
 
 #### Why must we correct for multiple hypothesis testing?
 
@@ -812,6 +700,7 @@ the null hypothesis (there is no differential expression) is true for
 all the genes. How many genes with an unadjusted P-value &lt; 0.05 do
 you think we will get?
 
+```r
     # create a new object and scramble the sample labels 
     dds2 <- dds
 
@@ -821,15 +710,7 @@ you think we will get?
     # check sample number in each group is the same 
     table(colData(dds)$group)
 
-    ## 
-    ## untreated       Dex       Alb   Alb_Dex 
-    ##         4         4         4         4
-
     table(colData(dds2)$group)
-
-    ## 
-    ## untreated       Dex       Alb   Alb_Dex 
-    ##         4         4         4         4
 
     # re-run the DEseq2 analysis using the new group variable as the design variable 
     dds2 <- DESeq(dds2)
@@ -847,17 +728,11 @@ you think we will get?
     # how many P-values < 0.05 
     sum(res2$pvalue < 0.05, na.rm=TRUE)
 
-    ## [1] 3054
-
     # how many FDR adjusted P-values < 0.05 
     sum(res2$padj < 0.05, na.rm=TRUE)
 
-    ## [1] 472
-
     # how many with Bonferonni adjusted P-values < 0.05 
     sum(res2$pvalue < (0.05/nrow(res2)), na.rm=TRUE)
-
-    ## [1] 35
 
     # plot the results 
     plot(res2$log2FoldChange, -log10(res2$pvalue), 
@@ -868,8 +743,7 @@ you think we will get?
     # add significance lines 
     abline(h= -log10(0.05), lty = 2, col = "red") # nominal P-value 
     abline(h= -log10(0.05/nrow(res2)), lty = 2, col = "black") # Bonferonni 
-
-<img src="day2-PART2_files/figure-markdown_strict/unnamed-chunk-25-1.png" style="display: block; margin: auto;" />
+```
 
 You can see that there are **minimal results with statistical
 signficance after correction**, which is true since we scrambled the
@@ -898,9 +772,9 @@ most of the range of expression values. To help identify genes that were
 significantly DE, any gene with an adjusted P-value of &lt; 0.05 (or
 whatever threshold is set) is colored in red.
 
+```r
     plotMA(res_ord, ylim=c(-6,6), main = "Raw Log2 Fold change")
-
-![](day2-PART2_files/figure-markdown_strict/unnamed-chunk-26-1.png)
+```
 
 The **log2 fold-change** plotted above is the raw LFC value estimated by
 the negative binomial GLM that we used in modeling. However, as we
@@ -924,30 +798,27 @@ bayes that we discussed for the **dispersion estimates**.
 DESeq2 provides a function `lfcShrink()` that must be implemented
 separately of the standard workflow implemented using `DESeq2()`.
 
+```r
     # calculate shrunken fold change estimate
     res_shrink <- lfcShrink(dds, 
                         coef=paste0(resultsNames(dds)[which(resultsNames(dds)=="group_Dex_vs_untreated")]), 
                         type="apeglm")
-
-    ## using 'apeglm' for LFC shrinkage. If used in published research, please cite:
-    ##     Zhu, A., Ibrahim, J.G., Love, M.I. (2018) Heavy-tailed prior distributions for
-    ##     sequence count data: removing the noise and preserving large differences.
-    ##     Bioinformatics. https://doi.org/10.1093/bioinformatics/bty895
+```
 
 After performing the shrinkage procedure, we compare the raw and
 shrunken LFCs to assess the impact of shrinkage.
 
 **Raw estimates of log2 FC:**
 
+```r
     plotMA(res_ord, ylim=c(-6,6), main = "Raw Log2 Fold change")
-
-<img src="day2-PART2_files/figure-markdown_strict/unnamed-chunk-28-1.png" style="display: block; margin: auto;" />
+```
 
 **Shrunken estimates of log2 FC:**
 
+```r
     plotMA(res_shrink, ylim=c(-6,6), main = "Shrunken Log2 Fold change")
-
-<img src="day2-PART2_files/figure-markdown_strict/unnamed-chunk-29-1.png" style="display: block; margin: auto;" />
+```
 
 We can see that **significantly DE genes are detected across the full
 range of expression values** (x-axis), which is a good sign that our
@@ -990,6 +861,7 @@ unsupervised hierachical clustering of the DEGs identified. We can do
 this by limiting the matrix of rlog values to only those for the DEGs,
 and then performing the clustering specifically on these data.
 
+```r
     rld <- rlog(dds, blind = FALSE)
     ind_to_keep <- c(which(colData(rld)$group=="untreated"), which(colData(rld)$group=="Dex"))
 
@@ -1025,8 +897,7 @@ and then performing the clustering specifically on these data.
 
     # plot the heatmap 
     draw(ht1, row_title = "Genes", column_title = "Hierachical clustering of DEGs (padj<0.05)")
-
-<img src="day2-PART2_files/figure-markdown_strict/unnamed-chunk-30-1.png" style="display: block; margin: auto;" />
+```
 
 ------------------------------------------------------------------------
 
@@ -1041,40 +912,53 @@ quick recap of these functions to help consolidate what we have learnt.
 
 Read in the data:
 
+```r
     cts <- as.matrix(read.table("Day-2/all_counts.txt", 
                                 sep="\t", header = TRUE, row.names=1, 
                                 stringsAsFactors = F))
+```
 
 Read in the metadata:
 
+```r
     sra_res <- read.csv("Day-2/sra_result.csv", row.names=1)
     sra_res$Sample <- sra_res$Sample.Accession
     sra_run <- read.csv("Day-2/SraRunInfo.csv", row.names=1)
+```
 
 Construct a DESeq2 dataset from the raw counts, the metadata, and the
 desired design variable to be tested for differential expression.
 
+```r
     dds <- DESeqDataSetFromMatrix(countData = cts,
                                   colData = colData,
                                   design = ~ group)
+```
 
 Apply the DESeq2 analysis pipeline:
 
+```r
     dds <- DESeq(dds)
+```
 
 Perform regularized log transformation:
 
+```r
     rld <- rlog(dds, blind = FALSE)
+```
 
 Use rlog to perform exploratory analyses: - Principal components
 analysis (PCA) - Unsupervised hierachical clustering
 
 Check the disperion estimates to evalute model fit:
 
+```r
     plotDispEsts(dds)
+```
 
 Extract, order, annotate, and subset the results from the DESeq2 object
 
+```r
     res <- results(dds, 
       name = "group_Dex_vs_untreated", 
       alpha = 0.05, 
@@ -1091,88 +975,21 @@ Extract, order, annotate, and subset the results from the DESeq2 object
 
     # subset results for only genes with adjusted P-values < 0.05
     res_order_FDR_05 <- res_ord[res_ord$padj<0.05,]
+```
 
 Perform empirical bayes shrinkage of raw fold-change estimates:
 
+```r
     res_shrink <- lfcShrink(dds, 
                         coef=paste0(resultsNames(dds)[which(resultsNames(dds)=="group_Dex_vs_untreated")]), 
                         type="apeglm")
+```
 
 Generate visualizations: - MA plots (raw vs shrunken fold-changes) -
 Volcano plots - Heatmaps
 
 Session Information
 -------------------
-
+```r
     sessionInfo()
-
-    ## R version 3.6.2 (2019-12-12)
-    ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-    ## Running under: macOS Catalina 10.15.7
-    ## 
-    ## Matrix products: default
-    ## BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
-    ## LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
-    ## 
-    ## locale:
-    ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
-    ## 
-    ## attached base packages:
-    ##  [1] grid      parallel  stats4    stats     graphics  grDevices utils    
-    ##  [8] datasets  methods   base     
-    ## 
-    ## other attached packages:
-    ##  [1] kableExtra_1.3.4            xtable_1.8-4               
-    ##  [3] apeglm_1.8.0                EnhancedVolcano_1.4.0      
-    ##  [5] ggrepel_0.9.1               ggplot2_3.3.3              
-    ##  [7] circlize_0.4.12             readr_1.4.0                
-    ##  [9] ComplexHeatmap_2.2.0        RColorBrewer_1.1-2         
-    ## [11] gplots_3.1.1                pheatmap_1.0.12            
-    ## [13] dplyr_1.0.6                 vsn_3.54.0                 
-    ## [15] biomaRt_2.42.1              DESeq2_1.26.0              
-    ## [17] SummarizedExperiment_1.16.1 DelayedArray_0.12.3        
-    ## [19] BiocParallel_1.20.1         matrixStats_0.58.0         
-    ## [21] Biobase_2.46.0              GenomicRanges_1.38.0       
-    ## [23] GenomeInfoDb_1.22.1         IRanges_2.20.2             
-    ## [25] S4Vectors_0.24.4            BiocGenerics_0.32.0        
-    ## [27] tximport_1.14.2            
-    ## 
-    ## loaded via a namespace (and not attached):
-    ##   [1] backports_1.2.1        Hmisc_4.5-0            BiocFileCache_1.10.2  
-    ##   [4] systemfonts_1.0.2      plyr_1.8.6             splines_3.6.2         
-    ##   [7] digest_0.6.27          htmltools_0.5.1.1      fansi_0.4.2           
-    ##  [10] magrittr_2.0.1         checkmate_2.0.0        memoise_2.0.0         
-    ##  [13] cluster_2.1.2          limma_3.42.2           annotate_1.64.0       
-    ##  [16] svglite_2.0.0          askpass_1.1            bdsmatrix_1.3-4       
-    ##  [19] prettyunits_1.1.1      jpeg_0.1-8.1           colorspace_2.0-1      
-    ##  [22] blob_1.2.1             rvest_1.0.0            rappdirs_0.3.3        
-    ##  [25] xfun_0.23              crayon_1.4.1           RCurl_1.98-1.3        
-    ##  [28] genefilter_1.68.0      survival_3.2-11        glue_1.4.2            
-    ##  [31] gtable_0.3.0           zlibbioc_1.32.0        XVector_0.26.0        
-    ##  [34] webshot_0.5.2          GetoptLong_1.0.5       shape_1.4.5           
-    ##  [37] scales_1.1.1           mvtnorm_1.1-1          DBI_1.1.1             
-    ##  [40] Rcpp_1.0.6             viridisLite_0.4.0      progress_1.2.2        
-    ##  [43] emdbook_1.3.12         htmlTable_2.2.1        clue_0.3-59           
-    ##  [46] foreign_0.8-76         bit_4.0.4              preprocessCore_1.48.0 
-    ##  [49] Formula_1.2-4          htmlwidgets_1.5.3      httr_1.4.2            
-    ##  [52] ellipsis_0.3.2         farver_2.1.0           pkgconfig_2.0.3       
-    ##  [55] XML_3.99-0.3           nnet_7.3-16            dbplyr_2.1.1          
-    ##  [58] locfit_1.5-9.4         utf8_1.2.1             labeling_0.4.2        
-    ##  [61] tidyselect_1.1.1       rlang_0.4.11           AnnotationDbi_1.48.0  
-    ##  [64] munsell_0.5.0          tools_3.6.2            cachem_1.0.5          
-    ##  [67] generics_0.1.0         RSQLite_2.2.7          evaluate_0.14         
-    ##  [70] stringr_1.4.0          fastmap_1.1.0          yaml_2.2.1            
-    ##  [73] knitr_1.33             bit64_4.0.5            caTools_1.18.2        
-    ##  [76] purrr_0.3.4            xml2_1.3.2             compiler_3.6.2        
-    ##  [79] rstudioapi_0.13        curl_4.3.1             png_0.1-7             
-    ##  [82] affyio_1.56.0          tibble_3.1.2           geneplotter_1.64.0    
-    ##  [85] stringi_1.6.2          highr_0.9              lattice_0.20-44       
-    ##  [88] Matrix_1.3-3           vctrs_0.3.8            pillar_1.6.1          
-    ##  [91] lifecycle_1.0.0        BiocManager_1.30.15    GlobalOptions_0.1.2   
-    ##  [94] data.table_1.14.0      bitops_1.0-7           R6_2.5.0              
-    ##  [97] latticeExtra_0.6-29    affy_1.64.0            KernSmooth_2.23-20    
-    ## [100] gridExtra_2.3          MASS_7.3-54            gtools_3.8.2          
-    ## [103] assertthat_0.2.1       openssl_1.4.4          rjson_0.2.20          
-    ## [106] withr_2.4.2            GenomeInfoDbData_1.2.2 hms_1.1.0             
-    ## [109] rpart_4.1-15           coda_0.19-4            rmarkdown_2.8         
-    ## [112] bbmle_1.0.23.1         numDeriv_2016.8-1.1    base64enc_0.1-3
+```
