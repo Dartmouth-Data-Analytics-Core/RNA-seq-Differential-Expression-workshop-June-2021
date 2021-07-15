@@ -1,4 +1,8 @@
 
+# TO DO:
+- incoprorate some features of bioinfo workshop statistics II section to help reduce text here 
+
+
 ### Exploratory data analysis & quality control
 
 Before we run the differential expression analysis, we should explore

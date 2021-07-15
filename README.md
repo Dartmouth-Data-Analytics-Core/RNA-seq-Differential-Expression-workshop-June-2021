@@ -1,7 +1,8 @@
 TO DO:
-- split mds up 
 - update README
 - reduce text in mds
+- continue revising normalization lesson
+- add lesson on statistical inference from bioinfo workshop
 
 
 

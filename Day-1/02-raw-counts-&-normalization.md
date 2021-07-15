@@ -1,5 +1,10 @@
 
-# Exploratory data analysis in R
+## TO DO
+
+incorproate section and implementations of norm approaches from rnaseq I workshop
+
+
+# Count data & normalization for RNA-seq
 ------------------------------
 
 ### Learning objectives:
@@ -10,7 +15,7 @@
 
 ------------------------------
 
-### Handling raw count data  
+### Importing count data into R  
 
 Several popular R-packges designed for exploration and statistical
 analysis of bulk RNA-seq data exist, including
@@ -91,7 +96,7 @@ read count abundances from *htseq-count*.
 
 ```r
 # read in the matrix we generated using htseq-count
-cts <- as.matrix(read.table("Day-2/all_counts.txt",
+cts <- as.matrix(read.table("data/all_counts.txt",
                             sep="\t",
                             header = TRUE,
                             row.names=1,
@@ -237,6 +242,21 @@ do the above everytime we want to work with our data).
 ```
 
 ------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Normalization of raw counts
 
