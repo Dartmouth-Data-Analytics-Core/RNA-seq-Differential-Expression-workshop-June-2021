@@ -8,9 +8,9 @@ TO DO:
 
 
 
-## RNA-seq data analysis workshop, July 2020
+## RNA-seq differential expresssion workshop, August 2021
 
-This workshop will be delivered on July 8th-9th 2020 by the Data Analytics Core (DAC) of the [Center for Quantitative Biology at Dartmouth](https://sites.dartmouth.edu/cqb/).
+This workshop will be delivered on August 23, 25, & 27 by the Data Analytics Core (DAC) of the [Center for Quantitative Biology at Dartmouth](https://sites.dartmouth.edu/cqb/).
 
 The DAC aims to facilitate advanced bioinformatic, computational, and statistical analysis of complex genomics data for the Dartmouth research community.
 
