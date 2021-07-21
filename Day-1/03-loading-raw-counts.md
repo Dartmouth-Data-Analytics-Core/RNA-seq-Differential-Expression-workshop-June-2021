@@ -1,9 +1,4 @@
 
-## TO DO
-
-incorproate section and implementations of norm approaches from rnaseq I workshop
-
-
 # Count data & normalization for RNA-seq
 ------------------------------
 
