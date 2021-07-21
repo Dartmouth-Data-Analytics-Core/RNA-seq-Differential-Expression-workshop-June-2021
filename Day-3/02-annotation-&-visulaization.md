@@ -1,3 +1,8 @@
+To do: 
+- adapt text so that this markdown reads appropriately as a standalone section 
+- reduce overall text where possible 
+- change paths to figures folder so that figures are shown in markdown 
+
 # Results annotation & visualization
 
 We want to also add the annotation data for each gene (symbol, genome
