@@ -1,3 +1,17 @@
+# Introduction to R
+
+------------------------------
+
+### Learning objectives:
+- Learn about more complex data structures often used by genomics packages
+- Learn how to write and use functions in R
+- Learn how to use loops in R
+- Learn how to create graphics in R
+- Learn how to import/export/save data in R 
+
+------------------------------
+
+
 ### Beyond the basic object classes
 
 As we discussed, one of the major advantages of R is its enormous user base that are continuously developing and releasing packages. Implementing the additional functionality of these packages often requires **more complex data object classes to be created**, which are generally related in some way to one or more of the basic data structures in R that we have discussed.
