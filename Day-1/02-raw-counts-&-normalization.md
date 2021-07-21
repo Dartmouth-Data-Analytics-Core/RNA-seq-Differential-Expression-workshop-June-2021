@@ -43,8 +43,6 @@ appropriate for the analysis of RNA-seq data with unique experimental
 designs, for example using linear-mixed effects models to perform
 differential expression analysis of clustered datasets.
 
-**Note:** You must change the below line, and all other lines loading
-images, to the directory on your computer!!
 
 ![](../figures/overview.png)
 
