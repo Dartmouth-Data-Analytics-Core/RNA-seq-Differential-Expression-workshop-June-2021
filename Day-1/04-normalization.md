@@ -1,8 +1,9 @@
 
 # To Do
 
-Add a description of TMM method 
-Ammend table at the bottom with components of mean-of-ratios and TMM methods
+Add a description of TMM method<br> 
+Ammend table at the bottom with components of mean-of-ratios and TMM methods<br>
+Image paths for norm methods - move figures from primary analysis workshop <br>
 
 
 # Part 4 - Data normalization in RNA-seq
