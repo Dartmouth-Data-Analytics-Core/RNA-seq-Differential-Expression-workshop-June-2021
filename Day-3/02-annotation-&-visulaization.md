@@ -1,4 +1,5 @@
 To do: 
+- add learning objectives
 - confirm code works with current directory structure 
 - adapt text so that this markdown reads appropriately as a standalone section 
 - reduce overall text where possible 
