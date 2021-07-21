@@ -1,5 +1,4 @@
-
-# TO DO:
+ TO DO:
 - incoprorate some features of bioinfo workshop statistics II section to help reduce text here 
 
 
