@@ -1,7 +1,8 @@
 
 ## TO DO
-
-incorproate section and implementations of norm approaches from rnaseq I workshop
+- incorproate section and implementations of norm. approaches from rnaseq I workshop (e.g. R-code to calculate TPM, summary table)
+- add content on normalization for diferential expression, using DESeq2 median ratios as example (i have a figure that may work from lecture for teaching QBS class) 
+- remove bullet point description of median of ratios from DE markdown on Day 3
 
 
 # Count data & normalization for RNA-seq
