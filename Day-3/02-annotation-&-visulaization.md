@@ -1,4 +1,5 @@
 To do: 
+- confirm code works with current directory structure 
 - adapt text so that this markdown reads appropriately as a standalone section 
 - reduce overall text where possible 
 - change paths to figures folder so that figures are shown in markdown 
