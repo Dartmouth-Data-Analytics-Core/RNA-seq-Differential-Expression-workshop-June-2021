@@ -380,6 +380,3 @@ video](https://www.rna-seqblog.com/rpkm-fpkm-and-tpm-clearly-explained/)
 provides an excellent explanation of *RPKM*, *FPKM*, & *TPM*, and
 explains why it is better to use TPM if you need to correct for
 **library size** AND **gene length**.
-
-
-![](../figures/gene_length.png)
