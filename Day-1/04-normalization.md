@@ -1,6 +1,8 @@
 
 # To Do
-Image paths for norm methods - move figures from primary analysis workshop <br>
+- Image paths for norm methods - move figures from primary analysis workshop 
+- add DESeq2 median ratios as example (i have a figure that may work from lecture for teaching QBS class) 
+- remove bullet point description of median of ratios from DE markdown on Day 3
 
 
 # Part 4 - Data normalization in RNA-seq
