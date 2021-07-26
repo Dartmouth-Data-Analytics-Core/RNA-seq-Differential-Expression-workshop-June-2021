@@ -1,7 +1,7 @@
 
 # To Do
-- Image paths for norm methods - move figures from primary analysis workshop 
-- add DESeq2 median ratios as example (i have a figure that may work from lecture for teaching QBS class) 
+- Image paths for norm methods - move figures from primary analysis workshop
+- add DESeq2 median ratios as example (i have a figure that may work from lecture for teaching QBS class)
 - remove bullet point description of median of ratios from DE markdown on Day 3
 
 
@@ -251,77 +251,75 @@ Total TPM values across samples are equal, therefore the TPM values for each gen
 Despite the benefits of interpretability achieved by TPM, limitations still exist, and TPM values (like RPKM/FPKM) are susceptible to misuse in some contexts, discussed further [in Zhao et al, 2020.](https://rnajournal.cshlp.org/content/early/2020/04/13/rna.074922.120). In particular, while TPM does normalize for library composition effects between samples, when composition effects become very large (such as when comparing between experimental groups in a differential expression experiment) TPM can suffer some biases.
 
 To address these issues, more complex normalization algorithms have been developed that more completely address library composition issues when very large differences in gene expression exist between samples. These methods are generally used to normalized RNA-seq data in the context of a differential expression analysis. For example:
-- *DESeq2's* median-of-ratios 
+- *DESeq2's* median-of-ratios
 - *EdgeR's* TMM method (Trimmed Mean of M-values)
 
 
-### Median-of-ratios DESeq2
+### *DESeq2* normalization: Median-of ratios
 
-To correct for **library size** AND **library composition**, DESeq2 uses
-a algorithm referred to as the **median-of-ratios** method. Although we
-won’t go over how the algorithm works in detail, a brief summary of the
-steps is:
+DESeq2 uses an algorithm referred to as the **median-of-ratios** method to correct for both **library size** AND **library composition**.
 
-1.  Take the log of all values in raw count matrix  
-2.  Average each row (genes)
-3.  Filter out genes with Infinity values
-4.  Subtract average log count value from log of count for each cell
-    (due to the laws of working with logarithms, this is essentially
-    calculating the ratio of the counts for gene X in 1 sample to the
-    average counts for gene X across all samples)
-5.  Calculate the median of the ratios in each sample (column)
-6.  Take exponents of medians to get the **size factors** for each
-    sample/library.
-7.  Divide the count for each gene in each sample by the size factor
-    calculated for that sample.
+This method is performed in two main steps:
+1. Calculate sample-specific size factors that are used to normalize each sample
+2. Normalize raw read counts for each sample using sample-specific size factors.
 
-This procedure will generate a matrix of read counts that are corrected
-for both **library size** and **library composition**, and are stored in
-our (`DESeqDataset`) object. DESeq2 uses the function
-(`estimateSizeFactors()`) to perform this algorithm and calculate size
-factors for each sample. Lets do this for our (`DESeqDataset`).
+The figure below provides an example of how these steps are performed to normalize a matrix of raw counts.
+
+<p align="center">
+<img src="../figures/deseq2-norm.png" alt="lib-composition"
+	title="" width="90%" height="90%" />
+</p>
+
+The method relies on the assumption that most genes **are not** differentially expressed, and those genes that **are** differentially expressed will not dramatically affect the median ratio values, making the size factors an appropriate normalization factor for each sample. If you expect this assumption to be violated, you should consider using a different method.
+
+Fortunately, DESeq2 provides the function `estimateSizeFactors()` to apply this method for us, accepting a `DESeqDataset` object as input to the function.
 
 ```r
     dds <- estimateSizeFactors(dds)
 ```
 
-Note: [This video](https://www.youtube.com/watch?v=UFB993xufUU) from
+> Note: [This video](https://www.youtube.com/watch?v=UFB993xufUU) from
 StatQuest provides an excellent summary of the steps performed by
-(`estimateSizeFactors()`) in order to calculate these size factors.
+`estimateSizeFactors()` in order to calculate these size factors.
 
-Once we have calculated the size factors, it can be helpful to look at
-their distribution to get a feel for how they vary and how much
-normalization between the samples is required.
+Size factors are usually close to 1, and presence of outliers could suggest violation of assumptions required to use the median of ratios method. Is is therefore helpful to check the distribution of size factors in our dataset.
 
 ```r
-    sizeFactors(dds)
+# extract size factors
+sizeFactors(dds)
 
-    hist(sizeFactors(dds),
-         breaks=6, col = "cornflowerblue",
-         xlab="Size factors", ylab="No. of samples",
-         main= "Size factor distribution over samples")
+# plot histogram
+hist(sizeFactors(dds),
+		 breaks=6, col = "cornflowerblue",
+     xlab="Size factors", ylab="No. of samples",
+     main= "Size factor distribution over samples")
 ```
 
 After we have calculated the size factors, we can use the `counts()`
 function, with `normalized` set to `TRUE`), to return the matrix of
 counts where each column (each library/sample) have been divided by the
-size factors calculated by the `estimateSizeFactors()` function.
+size factors.
 
 ```r
-    counts_norm <- counts(dds, normalized=TRUE)
-    head(counts_norm)
+# calculate normalized counts
+counts_norm <- counts(dds, normalized=TRUE)
+
+# print top rows
+head(counts_norm)
 ```
 
-Comparing the normalized to the raw counts, we can clearly see that they
-are different.
+Comparing the normalized to the raw counts, we can clearly see they are different.
 
 ```r
-    head(counts(dds, normalized=FALSE))
+head(counts(dds, normalized=FALSE))
 ```
+
 We can use this table of normalized read counts to compare values for
 individual genes across samples. We might want to use this to (sanity)
 check the expression of a few genes of interest, before we actually do
-any statistical modelling. Let's do this with the *DUSP1* gene that we used above.
+any statistical modeling.
+
+Let's do this with the *DUSP1* gene that we used above.
 
 ```r
     # lets make a function to generate a quick plot of the normalized counts
@@ -355,8 +353,7 @@ levels of individual genes across samples. The read counts are NOT
 normalized for gene length, so we cannot use this matrix to compare
 expression levels between genes within the same sample. This is
 important because some genes may simply pick up more reads than others
-because they are larger, making them appear more highly expressed than a
-smaller gene, which may not be the case.
+because they are larger, making them appear more highly expressed than a smaller gene, which may not be the case.
 
 For such comparisons between genes, we need to use measures such as:  
 - *Transcripts per million (TPM)*  
@@ -373,7 +370,7 @@ The below table summarizes the 3 normalization methods described above. It is im
 CPM | Counts per million | Depth	 | - Between-sample<br>- Within experimental group
 TPM | Transcripts per million | Depth & feature length | - Between- and within-sample<br>- Within experimental group
 RPKM/FPKM | Reads/fragments per kilobase<br>of exon per million | Depth & feature length | - Within-sample<br>
-median-of-ratios (DESeq2)| | library size and composition | - Between-sample
+DESeq2 | median-of-ratios | library size and composition | - Between-sample
 
 [This
 video](https://www.rna-seqblog.com/rpkm-fpkm-and-tpm-clearly-explained/)
