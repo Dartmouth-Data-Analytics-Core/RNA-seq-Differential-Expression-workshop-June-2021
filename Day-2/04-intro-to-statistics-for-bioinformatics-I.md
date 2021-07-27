@@ -1,8 +1,8 @@
-TO DO: 
-- get image files from bioinfo workshop and add to rnaseq workshop figure directory 
-- incorporate this markdown with part II script (in same directory) to cover materials on basic stats and linear models 
-- remove content on exploratory analysis (below) that is covered in Day-2 exploratory analysis markdown 
-- modify text to make sure all in context and pertains to rnaseq workshop (not bioinfo workshop) 
+TO DO:
+- get image files from bioinfo workshop and add to rnaseq workshop figure directory
+- incorporate this markdown with part II script (in same directory) to cover materials on basic stats and linear models
+- remove content on exploratory analysis (below) that is covered in Day-2 exploratory analysis markdown
+- modify text to make sure all in context and pertains to rnaseq workshop (not bioinfo workshop)
 
 
 # Introduction to statistics for bioinformatics - Part I
@@ -72,9 +72,6 @@ The statistical methods we use to address these sorts of questions are typically
 Below, we provide more specific introductions to both supervised and unsupervised learnings, using basic linear modeling as an example for supervised approaches, while exploring PCA and hierachical clustering for unsupervised analysis.
 
 > A more comprehensive introduction to statistical learning can be found in the book: [An Introduction to Statistical Learning](http://faculty.marshall.usc.edu/gareth-james/ISL/), in addition to numerous other statistical texts and online resources.
-
-
-
 ---
 
 

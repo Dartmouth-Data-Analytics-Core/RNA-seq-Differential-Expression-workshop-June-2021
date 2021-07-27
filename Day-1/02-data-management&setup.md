@@ -11,40 +11,19 @@
 
 ### Importing count data into R  
 
-Several popular R-packges designed for exploration and statistical
-analysis of bulk RNA-seq data exist, including
-[*EdgeR*](https://www.bioconductor.org/packages/release/bioc/html/edgeR.html),
-[*limma-voom*](http://bioconductor.org/packages/release/bioc/html/limma.html),
-[*DESeq2*](https://bioconductor.org/packages/release/bioc/html/DESeq2.html).
-For the purposes of this workshop, we will use DESeq2 to perform the
-parts of the analysis, including reading in the data, normalization of
-read counts, and fitting statistical models to test differential
-expression. [Detailed
-tutorials](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html)
-for using DESeq2 can be found on its Bioconductor page.
+Several R-packges exist that are designed for analysis of bulk RNA-seq data, including [*EdgeR*](https://www.bioconductor.org/packages/release/bioc/html/edgeR.html),[*limma-voom*](http://bioconductor.org/packages/release/bioc/html/limma.html), [*DESeq2*](https://bioconductor.org/packages/release/bioc/html/DESeq2.html). In this workshop, we will use DESeq2 to perform most analysis, including reading in the counts, normalization, and statistical modeling.
 
-DESeq2 is a very well organized package that applies robust algorithms
-to perform several aspects of RNA-seq data analysis. If you plan to use
-DESeq2 for your work, you should read both the tutorials made available
-on their Bioconductor page, and the original manuscript for DESeq2, in
-[Love *et al*,
-2014](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8)
-to develop an understanding of the theory behind DESeq2 and the
-proccesses implemented by its functions.
+> [Detailed
+tutorials](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html) for using DESeq2 can be found on its Bioconductor page.
 
-Despite DESeq2’s extensive functionality, a different package may be
-appropriate for the analysis of RNA-seq data with unique experimental
-designs, for example using linear-mixed effects models to perform
-differential expression analysis of clustered datasets.
+DESeq2 is a well organized package that applies robust algorithms to perform several aspects of RNA-seq data analysis. If you plan to use DESeq2 for your work, you should read both the tutorials made available on their Bioconductor page, and the original manuscript for DESeq2, in
+[Love *et al*, 2014](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8) to develop an understanding of the theory behind DESeq2 and the processes implemented by the package.
 
+Despite DESeq2’s extensive functionality, it may not be the best choice for all experimental designs, for example, analysis of time course experiments, or other designs where multiple data points are collected from the same subject/individual.
+
+The figure below provides an outline of the major setps in a standard DE analysis with DESeq2, and highlights key functions used at each step.
 
 ![](../figures/overview.png)
-
-
-
-```r
-setwd('~/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/')
-```
 
 Lets start by loading the packages we will need:
 
@@ -63,28 +42,30 @@ library(circlize)
 library(xtable)
 library(kableExtra)
 ```
+
+Set your working directory to the location of the workshop folder on your local machine:
+
+```r
+##### NOTE: YOU MAY NEED TO EDIT THE BELOW PATH
+setwd('~/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/')
+```
+
 ------------------------------------------------------------------------
 
-#### The dataset
+### The dataset
 
 The dataset that we are using comes from [this
-paper](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0099625).
-This data was collected from human airway smooth muscle cells to test
-gene pathways effected by exposure to Glucocorticoid, which have been
-historically used for their anti-inflammatory effects to treat
-asthmatics. Four cell lines were treated with either a control vehicle
-(untreated), **dexamethasone (dex)**, **albuterol (alb)**, or both
-**dexamethasone and albuterol (co-treated)** for 18 hours before
-transcriptomes were extracted.
+paper](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0099625), generated as part of a study exanmining the effects anti-inflammatory effects of glucocorticoids on human airway smooth muscle cells.
+
+Four cell lines were established from human donors and treated with one of the below:
+- Control (vehicle)
+- Dexamethasone (dex)
+- Albuterol (alb)
+- Both (dexamethasone + albuterol)
 
 ### Read in raw count data
 
-Now we can read in our data. How you read your data into DESeq2 depends
-on what format your raw reads counts are in (individual files for each
-sample, or a gene expression matrix) and how your read counts were
-quantified (e.g. at the gene or transcript level). `DESeq2` provides a
-specific function `DESeqDataSetFromHTSeqCount` to read in gene-level
-read count abundances from *htseq-count*.
+Now we can read in our data. How you read your data into DESeq2 depends on what format your raw reads counts are in (individual files for each sample, or a gene expression matrix) and how your read counts were quantified (e.g. at the gene or transcript level). `DESeq2` provides a specific function `DESeqDataSetFromHTSeqCount` to read in gene-level read count abundances from *htseq-count*.
 
 ```r
 # read in the matrix we generated using htseq-count
@@ -102,31 +83,13 @@ cts <- cts[1:(nrow(cts)-5),]
 tail(cts)
 ```
 
-If you estimated **transcript-level counts** (rather than **gene-level
-counts** produced by htseq-count) using a method like *RSEM*, *Salmon*,
-or *kallisto*, using the tximport() function from the [tximport
-package](https://f1000research.com/articles/4-1521/v1). You may have
-estimated transcript-level counts if you used a library-preparation
-protocol that captures full length transcript information.
+If you used an assay that captures fragments along the full length of RNA transcripts, and generated **transcript-level abundances** (rather than **gene-level counts**) using a method like *RSEM*, *Salmon*, or *kallisto*, you should load read counts into R using the `tximport()` function from the [tximport package](https://f1000research.com/articles/4-1521/v1).
 
-Even if you only plan to do a differential expression analysis at the
-gene-level, it has been shown that [transcript-level estimates can
-improve gene-level
-inferences](https://f1000research.com/articles/4-1521/v1), therefore if
-you are able to estimate counts at the transcript-level for your data,
-it is beneficial to do so. Briefly, this method works by collapsing
-transcript-level estimates into gene-level estimates, while an offset
-matrix is calculated based on the average transcript length, that is
-used in the differential expression analysis to correct for biases that
-may be introduced by transcript-length differences between samples. You
-can read more about how to do this in the [documnetation for
-tximport](https://bioconductor.org/packages/release/bioc/vignettes/tximport/inst/doc/tximport.html).
+Even if you only plan to do a gene-level DE analysis, it has been shown that [transcript-level estimates can improve gene-level inferences](https://f1000research.com/articles/4-1521/v1). Therefore if you are able to estimate counts at the transcript-level for your data, it is beneficial to do so.
 
-If you collected **3’-end data**, e.g. with the **Lexogen QuantSeq
-assay**, you should not do this correction for length, as there is no
-length bias in your data. Doing this correction would introduce bias
-into your data and likely distort your differential expression results.
-For 3’-end data, it is best to read in the raw count matrix directly
+Briefly, this method works by collapsing transcript-level estimates into gene-level estimates, while an offset matrix is calculated based on the average transcript length, that is used in the differential expression analysis to correct for biases that may be introduced by transcript-length differences between samples. You can read more about how to do this in the [documnetation for tximport](https://bioconductor.org/packages/release/bioc/vignettes/tximport/inst/doc/tximport.html).
+
+If you collected **3’-end data**, e.g. with the **Lexogen QuantSeq assay**, you should not do this correction for length, as there is no length bias in your data. Doing this correction would introduce bias into your data and likely distort your differential expression results. For 3’-end data, it is best to read in the raw count matrix directly
 using (`DESeqDataSetFromHTSeqCount`) or simply (`read.table()`).
 
 ------------------------------------------------------------------------
@@ -138,26 +101,27 @@ downloaded from the SRA, which contains sample labels, experimental
 labels, and sequencing run information, etc.
 
 ```r
-    # read in the file from the SRA metadata that has sample/experimental labels
-    colData <- read.csv("Day-2/sample_metadata.csv", row.names=1)
-    head(colData)
+# read in the file from the SRA metadata that has sample/experimental labels
+colData <- read.csv("data/sample_metadata.csv", row.names=1)
+head(colData)
 
-    # order by SRA run accession
-    colData <- colData[order(colData$SRR),]
-    # quick look
-    head(colData)
+# order by SRA run accession
+colData <- colData[order(colData$SRR),]
+
+# quick look
+head(colData)
 ```
 
 Lets have a look at our experimental design variable (drug treatment:)
 
 ```r
-    # now make this a factor as it will be the variable we will use define groups for the differential expression analysis
-    colData$tx.group
+# now make this a factor as it will be the variable we will use define groups for the differential expression analysis
+colData$tx.group
 
-    ##  [1] untreated Dex       Alb       Alb_Dex   untreated Dex       Alb      
-    ##  [8] Alb_Dex   untreated Dex       Alb       Alb_Dex   untreated Dex      
-    ## [15] Alb       Alb_Dex  
-    ## Levels: Alb Alb_Dex Dex untreated
+##  [1] untreated Dex       Alb       Alb_Dex   untreated Dex       Alb      
+##  [8] Alb_Dex   untreated Dex       Alb       Alb_Dex   untreated Dex      
+## [15] Alb       Alb_Dex  
+## Levels: Alb Alb_Dex Dex untreated
 ```
 
 It is important that we make this variable a (`factor`) class variable,
@@ -167,7 +131,7 @@ had not, you can create an ordered factor variable from a character
 string in R using:
 
 ```r
-    colData$tx.group <- factor(colData$tx.group, levels=c("untreated", "Dex", "Alb", "Alb_Dex"))
+colData$tx.group <- factor(colData$tx.group, levels=c("untreated", "Dex", "Alb", "Alb_Dex"))
 ```
 ------------------------------------------------------------------------
 
@@ -198,38 +162,25 @@ function by specifying a `SampleTable` that includes the path to the
 htseq-count files, however since we compiled the read counts into one
 file, we can just load the dataset directly.
 
-Before moving on, lets explore our DESeq2 class object a bit to get to
-familar with its contents.
+Before moving on, lets explore our DESeq2 class object a bit to get to familar with its contents.
 
 ```r
-    # have a quick look at the object
-    dds
-    # print structure
-    str(dds)
-    # several accessor functions exist to access specific data 'slots'
-    head(counts(dds))
-    head(colData(dds))
-    # specific slots can also be accessed using the '@'
-    dds@colData
+# have a quick look at the object
+dds
+
+# print structure
+str(dds)
+
+# several accessor functions exist to access specific data 'slots'
+head(counts(dds))
+head(colData(dds))
+
+# specific slots can also be accessed using the '@'
+dds@colData
 ```
 
-Lets drop genes that have less than 10 reads across all samples, as
-there just isn’t enough information for these genes to fit robust
-statistical models to.
+Lets save the DESeq2 object at this point (so that we don’t have to do the above everytime we want to work with our data).
 
 ```r
-    # drop genes with low counts
-    keep <- rowSums(counts(dds)) >= 10
-    dds <- dds[keep,]
-    dim(dds)
-
-    ## [1] 24419    16
+save(dds, file = "DESeq2.rdata")
 ```
-
-Lets also save the DESeq object at this point (so that we don’t have to
-do the above everytime we want to work with our data).
-
-```r
-    save(dds, file = "DESeq2.rdata")
-```
-

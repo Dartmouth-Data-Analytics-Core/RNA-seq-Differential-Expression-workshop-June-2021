@@ -1,8 +1,5 @@
-
-# To Do
-- Image paths for norm methods - move figures from primary analysis workshop
-- add DESeq2 median ratios as example (i have a figure that may work from lecture for teaching QBS class)
-- remove bullet point description of median of ratios from DE markdown on Day 3
+# To DO:
+- confirm if this is part 4 or part 3, and rename file name, or title of lesson below
 
 
 # Part 4 - Data normalization in RNA-seq
@@ -10,11 +7,37 @@
 ### Learning objectives:
 - Understand why read counts must be normalized in RNA-seq data
 - Learn the principles behind the major normalization strategies in RNA-seq and when to apply them
-- Learn how to perform these normalization strategies
+- Learn how to perform standard normalization strategies
+
+### Set-up
+
+If you started a new R session, you must load in the `DESeq2` object we created in the previous lesson, which contains the counts and sample metadata.
+
+```r
+# read in the RDS object
+dds <- readRDS("DESeq2.rdata")
+```
+
+As we saw in the last lesson, the `counts()` function can be used to extract the matrix of raw read counts from the DESeq2 object:
+```r
+cts <- counts(dds, normalized=FALSE)
+```
+
+These counts will be needed for the normalization exercises below.
+
+You will also need to load some R-packages that will be used in this lesson:
+```r
+library(ggplot2)
+library(tximport)
+library(DESeq2)
+library(biomaRt)
+library(vsn)
+library(pheatmap)
+```
 
 ## Count normalization in RNA-seq
 
-In order to compare expression levels between genes within a sample, or genes across multiple samples, it is critical the data is normalized to allow appropriate interpretation of the results. Which normalization strategy used depends on several factors such as library type, and type of comparison you wish to make (e.g. within- vs between-sample).
+To compare expression levels between genes within a sample, or genes across multiple samples, it is critical the data is normalized to allow appropriate interpretation of the results. Which normalization strategy used depends on several factors such as library type, and type of comparison you wish to make (e.g. within- vs between-sample).
 
 Below we will discuss the major sources of variation that need to be accounted for during normalization in order to reach appropriate conclusions about your results. Subsequently, we will discuss the normalization approaches that account for these sources of variation and when to use them.
 
@@ -76,7 +99,7 @@ CPM is a simple normalization method that involves scaling the number of reads m
 	title="" width="65%" height="65%" />
 </p>
 
-We will briefly use R to calculate CPM values for our dataset. If you are not familiar with R don't worry, this is not complex R code and many software packages will calculate normalized counts for you.
+Calculate CPM for our dataset:
 ```r
 # look at the counts object
 head(cts)
@@ -92,9 +115,8 @@ cpm <- function(counts) {
 
 # apply function to the columns of raw counts data
 # we start at the third column because the first two columns have the ensemble IDs and gene names
-cts_cpm <- apply(cts[3:5], 2, cpm)
-## NOTE: we are calculating cpm for first 3 samples only to save time..
-
+cts_cpm <- apply(cts[, 3:5], 2, cpm)
+## NOTE: we are calculating tpm for first 3 samples only to save time..
 # add gene info columns back in
 cts_cpm <- cbind(cts[, c(1,2)], cts_cpm)
 
@@ -134,7 +156,7 @@ tpm <- function(counts, lengths) {
 }
 
 # apply function to the columns of raw counts data
-cts_tpm <- apply(cts[, 3:5], 2, tpm, cts$length)
+cts_tpm <- apply(cts[, 3:5], 2, tpm, gene_lengths$length)
 ## NOTE: we are calculating tpm for first 3 samples only to save time..
 
 # add gene info columns back in
@@ -254,10 +276,13 @@ To address these issues, more complex normalization algorithms have been develop
 - *DESeq2's* median-of-ratios
 - *EdgeR's* TMM method (Trimmed Mean of M-values)
 
+-----
 
-### *DESeq2* normalization: Median-of ratios
 
-DESeq2 uses an algorithm referred to as the **median-of-ratios** method to correct for both **library size** AND **library composition**.
+
+### Normalization for DE analysis: DESeq2 Median-of ratios
+
+DESeq2 uses an algorithm referred to as the **median-of-ratios** method to correct for both **library size** AND **library composition**, allowing for comparisons to be made between expression levels for individual genes across samples.
 
 This method is performed in two main steps:
 1. Calculate sample-specific size factors that are used to normalize each sample
@@ -275,7 +300,7 @@ The method relies on the assumption that most genes **are not** differentially e
 Fortunately, DESeq2 provides the function `estimateSizeFactors()` to apply this method for us, accepting a `DESeqDataset` object as input to the function.
 
 ```r
-    dds <- estimateSizeFactors(dds)
+dds <- estimateSizeFactors(dds)
 ```
 
 > Note: [This video](https://www.youtube.com/watch?v=UFB993xufUU) from
@@ -295,10 +320,7 @@ hist(sizeFactors(dds),
      main= "Size factor distribution over samples")
 ```
 
-After we have calculated the size factors, we can use the `counts()`
-function, with `normalized` set to `TRUE`), to return the matrix of
-counts where each column (each library/sample) have been divided by the
-size factors.
+After we have calculated the size factors, we can use the `counts()` function, with `normalized` set to `TRUE`), to return the matrix of counts where each column (each library/sample) have been divided by the size factors.
 
 ```r
 # calculate normalized counts
@@ -314,56 +336,55 @@ Comparing the normalized to the raw counts, we can clearly see they are differen
 head(counts(dds, normalized=FALSE))
 ```
 
-We can use this table of normalized read counts to compare values for
-individual genes across samples. We might want to use this to (sanity)
-check the expression of a few genes of interest, before we actually do
-any statistical modeling.
+We can use this table of normalized read counts to compare values for individual genes across samples. We might want to use this to (sanity) check the expression of a few genes of interest, before we actually do any statistical modeling.
 
 Let's do this with the *DUSP1* gene that we used above.
-
 ```r
-    # lets make a function to generate a quick plot of the normalized counts
-    gene_plot <- function(ENSG, gene_symbol){
-      # save the normalized counts in a dataframe
-      cnts <- counts(dds, normalized=TRUE)
-      colnames(cnts) <- colData(dds)$SRR
-      # extract the counts for specified ENSG ID and add sample group data
-      df1 <- data.frame(log2(cnts[ENSG,]), colData(dds)$tx.group)
-      colnames(df1) <- c(paste0("log2_gene"), "sample_group")
-      # use ggplot2 to make a plot of counts vs sample group
-      p1<- ggplot(df1, aes(sample_group, log2_gene)) +
-        geom_jitter(aes(color = sample_group)) +
-        ggtitle(paste0(gene_symbol), " - Log2 Normalized counts")
-      # print the plot
-      print(p1)
-    }
-    # now apply the function to print a plot for a specified gene
-    gene_plot(ENSG = "ENSG00000120129", gene_symbol = "DUSP1")
+# lets make a function to generate a quick plot of the normalized counts
+gene_plot <- function(ENSG, gene_symbol){
+	# save the normalized counts in a dataframe
+	cnts <- counts(dds, normalized=TRUE)
+	colnames(cnts) <- colData(dds)$SRR
+
+	# extract the counts for specified ENSG ID and add sample group data
+	df1 <- data.frame(log2(cnts[ENSG,]), colData(dds)$tx.group)
+	colnames(df1) <- c(paste0("log2_gene"), "sample_group")
+
+	# use ggplot2 to make a plot of counts vs sample group
+	p1<- ggplot(df1, aes(sample_group, log2_gene)) +
+	      geom_jitter(aes(color = sample_group)) +
+	      ggtitle(paste0(gene_symbol), " - Log2 Normalized counts")
+
+	# print the plot
+	print(p1)
+}
+
+# now apply the function to print a plot for a specified gene
+gene_plot(ENSG = "ENSG00000120129", gene_symbol = "DUSP1")
 ```
 
-DUSP1 expression is consistently higher in the DEX samples than the
-untreated, suggesting this gene is differentially expressed after DEX
-treatment, validating prior knowledge and giving us confidence that our
-experiment worked, sample labels are all correct, and we are well
-positioned to make new discoveries with these data.
+<p align="center">
+<img src="../figures/dusp1-counts-de.png" alt=""
+	title="" width="75%" height="85%" />
+</p>
 
-**Important note:** the normalized count matrix is normalized for
-**library size and composition**, which means we can compare expression
-levels of individual genes across samples. The read counts are NOT
-normalized for gene length, so we cannot use this matrix to compare
-expression levels between genes within the same sample. This is
-important because some genes may simply pick up more reads than others
-because they are larger, making them appear more highly expressed than a smaller gene, which may not be the case.
+DUSP1 expression is consistently higher in the DEX samples than the untreated, suggesting this gene is differentially expressed, validating prior knowledge and giving us confidence that our experiment worked and sample labels are all correct.
+
+In a later lesson, we will discuss how the size factors calculated for count normalization with DESeq2 are used in formal statistical tests of differential expression.
+
+--------
+**Important note:** DESeq2 normalized read counts are NOT normalized for gene length, so cannot be used to compare expression levels *between genes within the same sample*.
 
 For such comparisons between genes, we need to use measures such as:  
 - *Transcripts per million (TPM)*  
 - *Fragments per kilobase million (FPKM)*  
 - *Reads per kilobase million (RPKM)*
 
+--------
 
-### Summary: Normalization method comparison
+## Summary
 
-The below table summarizes the 3 normalization methods described above. It is important to learn when it is appropriate to apply each one to your dataset based on the comparisons you are trying to make.
+The below table summarizes the normalization methods described above. It is important to learn when it is appropriate to apply each one to your dataset based on the comparisons you are trying to make.
 
 **Method** | **Name** | **Accounts for** | **Appropriate comparisons**
 -------|-------|-------|-------
@@ -372,8 +393,5 @@ TPM | Transcripts per million | Depth & feature length | - Between- and within-s
 RPKM/FPKM | Reads/fragments per kilobase<br>of exon per million | Depth & feature length | - Within-sample<br>
 DESeq2 | median-of-ratios | library size and composition | - Between-sample
 
-[This
-video](https://www.rna-seqblog.com/rpkm-fpkm-and-tpm-clearly-explained/)
-provides an excellent explanation of *RPKM*, *FPKM*, & *TPM*, and
-explains why it is better to use TPM if you need to correct for
-**library size** AND **gene length**.
+[This video](https://www.rna-seqblog.com/rpkm-fpkm-and-tpm-clearly-explained/) provides an excellent explanation of *RPKM*, *FPKM*, & *TPM*, and explains why it is better to use TPM if you need to correct for
+library size AND gene length.
