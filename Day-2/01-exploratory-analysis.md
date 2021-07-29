@@ -291,82 +291,78 @@ analyses to check for a batch effect.
 
 ### Part 2: Unsupervised hierarchical clustering
 
-Hierarchical clustering is another complimentary approach to explore the
-relationships between your samples. While supervised clustering
-approaches exist, we will perform an unsupervised analysis so that we do
-not impose any restrictions on the clustering of the samples.
+Hierarchical clustering is often complimentary to approaches like PCA, and involves the calculation of a *'distance metric'* that describes relationships between samples in a dataset. These distances can be used to generate a tree-like structure, called a *dendrogram* that describes the overall relatedness of individual samples and features (e.g. genes). Both supervised and unsupervised clustering methods exist, however unsupervised methods are generally used when we have no prior expectation for groups (clusters) thats should exist in the data.
 
-Hierachical clustering is often associated with **heatmaps**, as it is a
-useful way to explore the results of hierachical clustering. Here we
-represent genes are rows, and individual samples as columns. The
-**denrograms ** on the rows and the columns represent the *‘distances’*
-calculated between each of the genes/samples. Presenting the data in
-this way is useful as it allows us to identify samples whose patterns of
-gene expression are similar to each other, but also modules of genes
-that change in a similar way across our samples, and may share some
-common function of interest.
+Results from unsupervised hierarchical clustering analyses of RNA-seq data are commonly represented using heatmaps, where samples make up columns and genes are the rows. If both columns and rows are clustered, samples which share similar expression profiles will be placed closer to each other on the dendrogram, while genes that demonstrate similar patterns of variation across sample will be placed closer together.
+
+**Such heatmaps complement visualizations like PCA plots as they allow us to more easily identify modules of genes that vary in similar ways across the dataset.**
 
 <p align="center">
-<img src="../figures/heatmaps.png" alt="glength"
+<img src="../figures/unsup-clust-heatmap-1.png" alt="glength"
 	title="" width="90%" height="90%" />
 </p>
 
 
-The first step in a hierachical clustering analaysis is to *scale your
-data*. This means that expression levels are all transformed onto the
-same scale before clustering. This is important to do as we can only
-visualize so many colors at once, and a very highly expressed gene would
-mean that all the other genes would essentially invisible on this scale.
-Scaling for clustering in this way is typically performed by calculating
-Z-scores, where the mean for each gene across all the samples is
-subtracted from each of the individual expression values for each gene,
-this centers the expression values around 0. We then divide these values
-by the standard deviation to make sure the data is more tightly grouped,
-and we can represent lots of genes in the same scale.
+
+
+
+
+
+
+
+
+
+
+
+
+The first step in a hierachical clustering analaysis is to *scale your data*. This means that expression levels are all transformed onto the same scale before clustering. This is important to do as we can only visualize so many colors at once, and a very highly expressed gene would mean that all the other genes would essentially invisible on this scale. Scaling for clustering in this way is typically performed by calculating Z-scores, where the mean for each gene across all the samples is subtracted from each of the individual expression values for each gene, this centers the expression values around 0. We then divide these values by the standard deviation to make sure the data is more tightly grouped, and we can represent lots of genes in the same scale.
 
 Although we will not go into full detail here on how the actual
 clustering algorithm works to group samples and genes, once more
-**StatQuest** has an [excellent
-video](https://www.youtube.com/watch?v=oMtDyOn2TCc) on this topic.
+**StatQuest** has an [excellent video](https://www.youtube.com/watch?v=oMtDyOn2TCc) on this topic.
 
 Similarly to the PCA, we perform the clustering using the **rlog
-transformed data** and the **500 most variable features**, as features
-that do not vary across samples are not informative for dimension
-reduction appraoches.
+transformed data** and the **500 most variable features**, as features that do not vary across samples are not informative for dimension reduction approaches.
 
 ```r
-    # select top X no. of variable genes
-    topVarGenes <- head(order(rowVars(assay(rld)), decreasing=TRUE), var_feature_n)
-    # set up gene expression matrix
-    mat1 <- assay(rld)[topVarGenes,]
-    # scale matrix by each col. values
-    mat_scaled = t(apply(mat1, 1, scale))
-    # set up colors for heatmap
-    col = colorRamp2(c(-3, 0, 3), c("blue", "white", "red"))
-    cols1 <- brewer.pal(11, "Paired")
-    cols2 <- brewer.pal(9, "Greens")
-    # set up annotation bar for samples
-    ha1 = HeatmapAnnotation(Group = colData(dds)$tx.group,
-                            col = list(Group = c("untreated" = cols1[1], "Dex" = cols1[2],
-                                                 "Alb" = cols1[5], "Alb_Dex" = cols1[6])),
-                                       show_legend = TRUE)
-    # se up column annotation labels (samples)
-    ha = columnAnnotation(x = anno_text(colData(dds)$SRR,
-                                        which="column", rot = 45,
-                                        gp = gpar(fontsize = 10)))
-    # generate heatmap object
-    ht1 = Heatmap(mat_scaled,
-                  name = "Expression",
-                  col = col,
-                  top_annotation = c(ha1),
-                  bottom_annotation = c(ha),
-                  show_row_names = FALSE)
-    # plot the heatmap
-    draw(ht1, row_title = "Genes", column_title = "Top 500 most variable genes")
+# select top X no. of variable genes
+topVarGenes <- head(order(rowVars(assay(rld)), decreasing=TRUE), var_feature_n)
+
+# set up gene expression matrix
+mat1 <- assay(rld)[topVarGenes,]
+
+# set up colors for heatmap
+col = colorRamp2(c(0, 9, 18), c("blue", "white", "red"))
+cols1 <- brewer.pal(11, "Paired")
+cols2 <- brewer.pal(9, "Greens")
+
+# set up annotation bar for samples
+ha1 = HeatmapAnnotation(Group = colData(dds)$tx.group,
+                        col = list(Group = c("untreated" = cols1[1],
+                                             "Dex" = cols1[2],
+                                             "Alb" = cols1[5],
+                                             "Alb_Dex" = cols1[6])),
+                                             show_legend = TRUE)
+
+# se up column annotation labels (samples)
+ha = columnAnnotation(x = anno_text(colData(dds)$SRR,
+                                    which="column", rot = 45,
+                                    gp = gpar(fontsize = 10)))
+# generate heatmap object
+ht1 = Heatmap(mat1,
+              name = "Expression",
+              col = col,
+              top_annotation = c(ha1),
+              bottom_annotation = c(ha),
+              show_row_names = FALSE,
+              show_col_names = FALSE)
+
+# plot the heatmap
+draw(ht1, row_title = "Genes", column_title = "Top 500 most variable genes")
 ```
 
 <p align="center">
-<img src="../figures/pca_example.png" alt="glength"
+<img src="../figures/unsup-clust-heatmap-2.png" alt="glength"
 	title="" width="90%" height="90%" />
 </p>
 
@@ -374,87 +370,102 @@ As we saw in the PCA, the Alb and co-treated samples do not form any
 clear clusters. We may want to remove them and perform the clustering
 again so that we can compare the untreated and Dex samples more easily.
 
+
+
+
+
+
+NOTE ON SCALING
+
+
+
+
+
+
+
 ```r
-    ind_to_keep <- c(which(colData(rld)$group=="untreated"), which(colData(rld)$group=="Dex"))
-    topVarGenes <- head(order(rowVars(assay(rld)[,ind_to_keep]), decreasing=TRUE), var_feature_n)
-    # set up gene expression matrix
-    mat1 <- assay(rld)[topVarGenes, ind_to_keep]
-    # scale matrix by each col. values
-    mat_scaled = t(apply(mat1, 1, scale))
-    # set up colors for heatmap
-    col = colorRamp2(c(-3, 0, 3), c("blue", "white", "red"))
-    cols1 <- brewer.pal(11, "Paired")
-    cols2 <- brewer.pal(9, "Greens")
-    # subset coldata for samples in untx and ex groups
-    colData_sub <- colData(dds)[ind_to_keep, ]
-    # set up annotation bar for samples
-    ha1 = HeatmapAnnotation(Group = colData_sub$tx.group,
-                            col = list(Group = c("untreated" = cols1[1], "Dex" = cols1[2])),
-                                       show_legend = TRUE)
-    # se up column annotation labels (samples)
-    ha = columnAnnotation(x = anno_text(colData_sub$SRR,
-                                        which="column", rot = 45,
-                                        gp = gpar(fontsize = 10)))
-    # generate heatmap object
-    ht1 = Heatmap(mat_scaled, name = "Expression", col = col,
-                  top_annotation = c(ha1),
-                  bottom_annotation = c(ha),
-                  show_row_names = FALSE)
-    # plot the heatmap
-    draw(ht1, row_title = "Genes", column_title = "Top 500 most variable genes")
+# select sample groups to keep
+ind_to_keep <- c(which(colData(rld)$group=="untreated"), which(colData(rld)$group=="Dex"))
+
+# select top variable features
+topVarGenes <- head(order(rowVars(assay(rld)[,ind_to_keep]), decreasing=TRUE), var_feature_n)
+
+# set up gene expression matrix
+mat1 <- assay(rld)[topVarGenes, ind_to_keep]
+
+# set up colors for heatmap
+col = colorRamp2(c(0, 9, 18), c("blue", "white", "red"))
+cols1 <- brewer.pal(11, "Paired")
+cols2 <- brewer.pal(9, "Greens")
+
+# subset coldata for samples in untx and ex groups
+colData_sub <- colData(dds)[ind_to_keep, ]
+
+# set up annotation bar for samples
+ha1 = HeatmapAnnotation(Group = colData_sub$tx.group,
+                        col = list(Group = c("untreated" = cols1[1],
+                                             "Dex" = cols1[2])),
+                                             show_legend = TRUE)
+
+# se up column annotation labels (samples)
+ha = columnAnnotation(x = anno_text(colData_sub$SRR,
+                                    which="column", rot = 45,
+                                    gp = gpar(fontsize = 10)))
+# generate heatmap object
+ht1 = Heatmap(mat1, name = "Expression", col = col,
+              top_annotation = c(ha1),
+              bottom_annotation = c(ha),
+              show_row_names = FALSE,
+              show_column_names = FALSE)
+
+# plot the heatmap
+draw(ht1, row_title = "Genes", column_title = "Top 500 most variable genes")
 ```
 
 <p align="center">
-<img src="../figures/pca_example.png" alt="glength"
+<img src="../figures/unsup-clust-heatmap-2.png" alt="glength"
 	title="" width="90%" height="90%" />
 </p>
 
 
 There does indeed seem to be relatively good clustering between
-untreated and Dex samples, suggesting there are unique gene expression
-programs defining the Dex samples from the untreated. However, one of
-these samples in the Dex group seems to be clustered further away from
-the other Dex samples. This could be the Dex treated sample that
-clustered away from the other Dex treated samples on the PCA. We can add
-an annotation bar for the fake batch effect we created earlier to this
-plot to confirm this.
+untreated and Dex samples, suggesting there are unique gene expression programs defining the Dex samples from the untreated. However, one of these samples in the Dex group seems to be clustered further away from the other Dex samples. This could be the Dex treated sample that clustered away from the other Dex treated samples on the PCA. We can add an annotation bar for the fake batch effect we created earlier to this plot to confirm this.
 
 ```r
-    # which samples had values > 10 for PC2
-    pca_df$sample_ids[pca_df$PC2 > 10 & pca_df$tx.group=="untreated"]
+# which samples had values > 10 for PC2
+pca_df$sample_ids[pca_df$PC2 > 10 & pca_df$tx.group=="untreated"]
+# or <10 for PC2
+pca_df$sample_ids[pca_df$PC2 > 10 & pca_df$tx.group=="Dex"]
 
-    pca_df$sample_ids[pca_df$PC2 > 10 & pca_df$tx.group=="Dex"]
+# set the batch variable for these samples as batch 2
+colData_sub$batch <- "Batch 1"
+colData_sub$batch[colData_sub$SRR=="SRR1039516"] <- "Batch 2"
+colData_sub$batch[colData_sub$SRR=="SRR1039517"] <- "Batch 2"
 
-    # set the batch variable for these samples as batch 2
-    colData_sub$batch <- "Batch 1"
-    colData_sub$batch[colData_sub$SRR=="SRR1039516"] <- "Batch 2"
-    colData_sub$batch[colData_sub$SRR=="SRR1039517"] <- "Batch 2"
+# set up annotation bar for samples
+ha1 = HeatmapAnnotation(group = c(as.character(colData_sub$tx.group)),
+                        batch = c(as.character(colData_sub$batch)),
+                        col = list(group = c("untreated" = cols1[1], "Dex" = cols1[2]),
+                        batch = c("Batch 1" = cols1[5], "Batch 2" = cols1[6])),
+                        show_legend = TRUE)
 
-    # set up annotation bar for samples
-    ha1 = HeatmapAnnotation(group = c(as.character(colData_sub$tx.group)),
-                            batch = c(as.character(colData_sub$batch)),
-                            col = list(group = c("untreated" = cols1[1], "Dex" = cols1[2]),
-                                       batch = c("Batch 1" = cols1[5], "Batch 2" = cols1[6])),
-                                       show_legend = TRUE)
-    # generate heatmap object
-    ht2 = Heatmap(mat_scaled, name = "Expression", col = col,
-                  top_annotation = c(ha1),
-                  bottom_annotation = c(ha),
-                  show_row_names = FALSE)
-    # plot the heatmap
-    draw(ht2, row_title = "Genes", column_title = "Top 500 most variable genes")
+# generate heatmap object
+ht2 = Heatmap(mat1, name = "Expression", col = col,
+              top_annotation = c(ha1),
+              bottom_annotation = c(ha),
+              show_row_names = FALSE,
+              show_column_names = FALSE)
+
+# plot the heatmap
+draw(ht2, row_title = "Genes", column_title = "Top 500 most variable genes")
 ```
 
 <p align="center">
-<img src="../figures/pca_example.png" alt="glength"
+<img src="../figures/unsup-clust-heatmap-3.png" alt="glength"
 	title="" width="90%" height="90%" />
 </p>
 
 Based on our newly labeled plot it does seem that these 2 samples are
 outliers based on the hierachical clustering, which would support the
 presence of a batch effect if these data were infact collected in
-multiple batches. Again without the metadata to indicate this is a batch
-effect using a method to correct for a batch effect is inappropriate. In
-this case I would reach out to the seqeuncing center or authors of the
-paper where the data was published and ask for additional metadata to
-confirm our suspicion about batch effects in this data.
+multiple batches. Again without the metadata to indicate this is a batch effect using a method to correct for a batch effect is inappropriate. In this case I would reach out to the seqeuncing center or authors of the paper where the data was published and ask for additional metadata to confirm our suspicion about batch effects in this data.
