@@ -1,5 +1,5 @@
- TO DO:
-- incoprorate some features of bioinfo workshop statistics II section to help reduce text here
+TO DO:
+- add section at end on scaling
 
 
 # 01 - Exploratory data analysis
@@ -58,6 +58,8 @@ StatQuest has an excellent [video](https://www.youtube.com/watch?v=_UVHneBUBW0) 
 #### Performing PCA on RNA-seq data
 
 To perform mathematical procedures such as PCA, it is best to transform the raw counts. DESeq2 provides its own transformation procedure, called the **regularized logatrithm (rlog)** implemented with the `rlog()` function. The rlog is similar in principle to a standard log transformation of the data, but is able to more appropriately transform the counts for genes with low expression values.
+
+It is important to note that `rlog()` transformed values incorporates the size factors calculated for DESeq2 normalization of sequencing depth, therefore rlog values are comparable between samples.
 
 > DESeq2 is also capable of implementing the popular **variance stabilizing transformation (VST)** for count data, which is generally recommended for larger datasets due to increased speed.
 
@@ -291,35 +293,23 @@ analyses to check for a batch effect.
 
 ### Part 2: Unsupervised hierarchical clustering
 
-Hierarchical clustering is often complimentary to approaches like PCA, and involves the calculation of a *'distance metric'* that describes relationships between samples in a dataset. These distances can be used to generate a tree-like structure, called a *dendrogram* that describes the overall relatedness of individual samples and features (e.g. genes). Both supervised and unsupervised clustering methods exist, however unsupervised methods are generally used when we have no prior expectation for groups (clusters) thats should exist in the data.
+Hierarchical clustering is complimentary to approaches like PCA, and is used to assess relationships between samples and features (e.g. genes) in a dataset. Visualizing these relationships provides insight into which samples are most similar/dissimilar, as well as identify genes that changes in similar ways across a dataset.
 
-Results from unsupervised hierarchical clustering analyses of RNA-seq data are commonly represented using heatmaps, where samples make up columns and genes are the rows. If both columns and rows are clustered, samples which share similar expression profiles will be placed closer to each other on the dendrogram, while genes that demonstrate similar patterns of variation across sample will be placed closer together.
-
-**Such heatmaps complement visualizations like PCA plots as they allow us to more easily identify modules of genes that vary in similar ways across the dataset.**
+Both supervised and unsupervised clustering methods exist, however unsupervised methods are generally used when we have no prior expectation for groups (clusters) thats should exist in the data. To generate clusters, a **distance metric** is calculated, where smaller values represent more similar samples, which are grouped together into clusters. A **dendrogram** is used to represent the relationships between samples, as determined during the clustering process. The results are commonly visualized using a heatmap.
 
 <p align="center">
-<img src="../figures/unsup-clust-heatmap-1.png" alt="glength"
+<img src="../figures/heatmaps.png" alt="glength"
 	title="" width="90%" height="90%" />
 </p>
 
+Expression levels of each gene determine the colors shown in each cell of the heatmap, and allow us to identify genes expressed at different levels across samples. If both columns and rows are clustered, samples which share similar expression profiles will be placed closer to each other on the dendrogram, while genes that demonstrate similar patterns of variation across sample will be placed closer together, allowing us to identify **modules** of co-varying genes.
 
+Although we will not go into detail on how the clustering algorithm works, **StatQuest** has an [excellent video](https://www.youtube.com/watch?v=7xHsRkOdVwo&ab_channel=StatQuestwithJoshStarmer) that explains the process in more detail, as well as [another video](https://www.youtube.com/watch?v=oMtDyOn2TCc&ab_channel=StatQuestwithJoshStarmer) that summarizes the process of drawing and interpreting heatmaps.
 
+> ##### Distance metrics
+Several distance metrics exist (e.g. euclidean distance, manhattan distance) and are calculated differently. Although the results will often be the same across several distance metrics, which one is most appropriate depends on your dataset.
 
-
-
-
-
-
-
-
-
-
-
-The first step in a hierachical clustering analaysis is to *scale your data*. This means that expression levels are all transformed onto the same scale before clustering. This is important to do as we can only visualize so many colors at once, and a very highly expressed gene would mean that all the other genes would essentially invisible on this scale. Scaling for clustering in this way is typically performed by calculating Z-scores, where the mean for each gene across all the samples is subtracted from each of the individual expression values for each gene, this centers the expression values around 0. We then divide these values by the standard deviation to make sure the data is more tightly grouped, and we can represent lots of genes in the same scale.
-
-Although we will not go into full detail here on how the actual
-clustering algorithm works to group samples and genes, once more
-**StatQuest** has an [excellent video](https://www.youtube.com/watch?v=oMtDyOn2TCc) on this topic.
+#### Cluster the dataset using unsupervised clustering  
 
 Similarly to the PCA, we perform the clustering using the **rlog
 transformed data** and the **500 most variable features**, as features that do not vary across samples are not informative for dimension reduction approaches.
@@ -362,26 +352,13 @@ draw(ht1, row_title = "Genes", column_title = "Top 500 most variable genes")
 ```
 
 <p align="center">
-<img src="../figures/unsup-clust-heatmap-2.png" alt="glength"
+<img src="../figures/unsup-clust-heatmap-1.png" alt="glength"
 	title="" width="90%" height="90%" />
 </p>
 
 As we saw in the PCA, the Alb and co-treated samples do not form any
 clear clusters. We may want to remove them and perform the clustering
 again so that we can compare the untreated and Dex samples more easily.
-
-
-
-
-
-
-NOTE ON SCALING
-
-
-
-
-
-
 
 ```r
 # select sample groups to keep
@@ -428,7 +405,7 @@ draw(ht1, row_title = "Genes", column_title = "Top 500 most variable genes")
 </p>
 
 
-There does indeed seem to be relatively good clustering between
+There does appear to be reasonable clustering between
 untreated and Dex samples, suggesting there are unique gene expression programs defining the Dex samples from the untreated. However, one of these samples in the Dex group seems to be clustered further away from the other Dex samples. This could be the Dex treated sample that clustered away from the other Dex treated samples on the PCA. We can add an annotation bar for the fake batch effect we created earlier to this plot to confirm this.
 
 ```r
@@ -466,6 +443,6 @@ draw(ht2, row_title = "Genes", column_title = "Top 500 most variable genes")
 </p>
 
 Based on our newly labeled plot it does seem that these 2 samples are
-outliers based on the hierachical clustering, which would support the
-presence of a batch effect if these data were infact collected in
-multiple batches. Again without the metadata to indicate this is a batch effect using a method to correct for a batch effect is inappropriate. In this case I would reach out to the seqeuncing center or authors of the paper where the data was published and ask for additional metadata to confirm our suspicion about batch effects in this data.
+outliers, supporting the presence of a potentially non-biological factor affecting gene expression in these data (such as a batch effect).
+
+#### Notes on scaling data prior to hierarchical clustering
