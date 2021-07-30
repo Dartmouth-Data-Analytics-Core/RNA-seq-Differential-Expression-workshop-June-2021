@@ -7,31 +7,24 @@
 
 ### Introduction
 
-xxx
+Simple linear models, or linear regression, is used pervasively in bioinformatics and genomics for statistical inference. Linear models are relatively simple, flexible, and interpretable, meaning they make excellent tools for statistical inference and scale well to thousands of observations, which is critical for common genomics datasets.
 
-> NOTE: When using popular R-packages such as DESeq2 for DE analyses, you will not need to explicity define a linear model using base functions in R as the packages generally provide wrapper functions that fit the models for you. However, it is important that you understand what is going on 'under the hood' in order to always perform your analysis correctly.
-
-
-
-
-
-
-
-### Supervised learning - Linear modeling
-
-Simple linear models, or linear regression, is used pervasively in bioinformatics and genomics for statistical inference. Linear models are relatively simple, flexible, and interpretable, meaning they make excellent tools for statistical inference and scale well to thousands of observations, which is critical for common genomics datasets. Example applications of linear models include:
-- RNA-seq (differential expression)
+Beyond differential expression analysis, many types of genomic data anlaysis rely on linear models:
 - ChIP-seq (differential binding)
 - ATAC-seq (differential accessibility)
 - Microarray analysis (e.g. DNA methylation)
 - Variant identification (WES/WGS/RNA-seq)
 - Genome-wide association studies (GWAS)
 
-Understanding the basics of linear modeling is central to being able to perform these types of analyses in a statistical programming environment such as R.
+When performing differential expression analysis with popular R-packages such as DESeq2, you usually do not need to explicity define a linear model yourself using base functions in R. However, it is important that you understand what is going on 'under the hood' in order to always perform your analysis correctly.
 
-Given their importance and pervasive use in bioinformatics and genomics, we will introduce the fundamental concepts of linear models, and how you can fit these models in R.
+In the lesson below, we will introduce the basic concepts of linear models and how they can be fit in R, in order to provide you with a foundation upon which to begin learning the basics of differential expression analysis.
 
-> **Note:** Linear modeling is the topic of entire independent courses and again requires knowledge of appropriate mathematics and propbability to understand completely. Thus, this should be considered an introduction rather than a standalone resource.
+> NOTE: Linear modeling is the topic of entire independent courses and again requires knowledge of appropriate mathematics and probability to understand completely. Thus, this should be considered an introduction rather than a standalone resource.
+
+------
+
+### Part 1 - Basic terminology
 
 In a standard linear model, we assume that some *response* variable (*Y*) can be represented as a linear combination of a set of *predictors* (*X*, independent variables). In building a linear model, we estimate a set of *coefficients* that explain how the *predictors* are related to the *response*. We can use these *coefficients* for statistical inference to better understand which predictors are associated with our response, or for applying the model to new data where we wish to predict the response variable using only a set of predictors.
 
@@ -58,11 +51,15 @@ There can be any (reasonable) number of predictors (X) in a model, and predictor
 
 Each predictor is associated with a coefficient that describes the relationship of that predictor to the response variable. In the context of linear regression, the coefficient is also referred to as the *slope*.
 
-In R, the basic syntax for this model is: `lm(response ~ predictor)`. Lets simulate some data that we can use to illustrate the theory described above and fit out first linear model in R.
+------
+
+### Part 2 - Linear models in R
+
+In R, the basic syntax for a basic linear model is: `lm(response ~ predictor)`. Lets simulate some data that we can use to illustrate the theory described above and fit out first linear model in R.
 
 ```r
 # read in the example data
-dat <- read.csv("lm-example-data.csv", stringsAsFactors=FALSE)
+dat <- read.csv("data/lm-example-data.csv", stringsAsFactors=FALSE)
 
 # explore it quickly
 head(dat)
@@ -117,7 +114,9 @@ One way to evaluate how much meaning we should attribute to the coefficient, is 
 
 > **Note:** Although standard models for modeling gene expression data would include expression values as the response variable, these models usually take on a more complicated form (see note on *Generalized linear models* below), however we have set up a simple model for teaching purposes.
 
-#### Hypothesis testing with linear models
+------
+
+### Part 3 - Hypothesis testing with linear models
 
 In order to test how much certainty we have for a particular coefficient from a linear model, we estimate a quantity called **the standard error (SE)**. Without discussing the underlying statistics that define it, the SE is essentially a *measure of certainty around the coefficient*, and is dependent on the variance of the residuals (&epsilon;).
 
@@ -147,7 +146,7 @@ If the *P*-value does not pass the *a priori* significance threshold for your an
 You can always confirm by looking at the slope in a simple linear model. To demonstrate this, explore the example below for Gene Y and its relation to Hba1c levels.
 ```r
 # read in the example data
-dat2 <- read.csv("lm-example-data-geneY.csv", stringsAsFactors=FALSE)
+dat2 <- read.csv("data/lm-example-data-geneY.csv", stringsAsFactors=FALSE)
 
 # plot
 plot(dat2$gene_exp ~ dat2$hba1c,
@@ -174,9 +173,10 @@ segments(dat2$hba1c, dat2$gene_exp, dat2$hba1c, pre, col="cornflowerblue")
 
 The flatter slope of the regression line, and larger values of the residuals, suggests there is no useful relationship between Hba1c levels and expression of gene Y, which is supported by the large *P*-value returned by the model.
 
----
 
-#### Simple Linear modeling with categorical variables
+------
+
+### Part 4 - Simple Linear modeling with categorical variables
 
 In genomics, we commonly have categorial predictor variables, in contrast to the continuous variable (Hba1c) from our example above. Example of categorial variable include:
 - Wild-type vs knockout
@@ -187,7 +187,7 @@ Importantly, linear models are capable of incorporating categorical variables as
 
 ```r
 # read in the example data
-dat3 <- read.csv("lm-example-3.csv", stringsAsFactors=FALSE, row.names = 1)
+dat3 <- read.csv("data/lm-example-3.csv", stringsAsFactors=FALSE, row.names = 1)
 
 # quickly explore it
 head(dat3)
@@ -214,14 +214,15 @@ Again, the coefficient tells us about the relationship between the predictor and
 
 Since a 'unit increase' in `subject_group` simply means controls vs diseased subjects, we can interpret this as the difference in expression between controls and cases. This is analgous to how we would calculate a fold-change value in an RNA-seq analysis.
 
----
-#### Multiple regression
+------
+
+### Part 4 - Multiple regression
 
 We could have simply addressed the above analysis using a more simple statistical test such as a *t-test*. However, we commonly want to include additional variables in our linear models, and approaches such as the t-test cannot handle this scenario.
 
 For example, we might want to control for factors that could confound gene expression differences between the control and diseased groups. For example, we could control for age and sex of the subjects, or perhaps the batch the samples were collected in.
 
-In this scenario, we can use linear models to control for the additional variables by adding them into the statsitical model e.g.
+In this scenario, we can use linear models to control for the additional variables by adding them into the statistical model e.g.
 
 *Just an example do not run this code*
 ```r
@@ -232,7 +233,7 @@ This approach is referred to as **multiple regression**. If you will be doing an
 
 ---
 
-#### Generalized linear models
+### Part 5 - Generalized linear models
 
 While standard linear models are very useful, there are situations where their use is not appropriate, for example:
 
@@ -258,7 +259,3 @@ Linear models are therefore generally not suitable to model read count data, and
 - the use of a *link-function* that links the expression values in the linear model to the experimental groups, in a way that these other distributions can be used.
 
 For analysis of bulk RNA-seq data, we use a GLM of the *negative-binomial family* in order to appropriately model RNA-seq counts and calculate P-values and test them for differential expression. This approach is adopted by popular Bioconductor-packages for differential expression such as [DESeq2](http://bioconductor.org/packages/release/bioc/html/DESeq2.html) and [edgeR](https://www.bioconductor.org/packages/release/bioc/html/edgeR.html).
-
-If you will be using software such as DESeq2 and edgeR in your own analysis, it is recommended to build a good fundamental understqanding of linear modeling and GLMs. While an comprehensive introduction to GLMs is beyond the scope of this workshop, this topic is covered in many good statistical textbooks and online courses.
-
-> Note: We do cover the fundamentals of how GLMs are used in the context of RNA-seq data analysis in our RNA-seq dat analysis workshop.

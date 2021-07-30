@@ -1,5 +1,5 @@
-TO DO: 
-- reduce text and try add more images to improve flow 
+TO DO:
+- reduce text and try add more images to improve flow
 - remove/reduce content covered in statistical inference section (linear models, GLM principles etc.)
 
 
