@@ -1,12 +1,28 @@
-To do: 
+To do:
 - add learning objectives
-- confirm code works with current directory structure 
-- adapt text so that this markdown reads appropriately as a standalone section 
-- reduce overall text where possible 
-- change paths to figures folder so that figures are shown in markdown 
+- confirm code works with current directory structure
+- adapt text so that this markdown reads appropriately as a standalone section
+- reduce overall text where possible
+- change paths to figures folder so that figures are shown in markdown
 
 
 # Results annotation & visualization
+
+
+```r
+library(vsn)
+library(dplyr)
+library(pheatmap)
+library(gplots)
+library(RColorBrewer)
+library(ComplexHeatmap)
+library(readr)
+library(circlize)
+library(EnhancedVolcano)
+library(apeglm)
+library(xtable)
+library(kableExtra)
+```
 
 We want to also add the annotation data for each gene (symbol, genome
 coordinates, etc.) to the results. Since we used Ensembl version 97 to
