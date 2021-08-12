@@ -1,5 +1,5 @@
 TOI DO:
-- add table on test-statitics 
+- add table on test-statitics
 - add R packages to load to setup
 
 # 02 - Fundamental statistics for Differential Expression analysis
@@ -200,6 +200,6 @@ No results were identified as significant after correcting for multiple testing,
 This example highlights the short coming of hypothesis testing approaches, and demonstrates how important it is to correct for multiple hypothesis testing. **Always perform multiple testing correction**.
 
 
-An good summary of multiple testing correction in high throughput genomics experiments can be found [here](https://www.nature.com/articles/nbt1209-1135). An excellent video describing the FDR-based methods can be found [here](https://www.youtube.com/watch?v=K8LQSvtjcEo&ab_channel=StatQuestwithJoshStarmer) by StatQuest.
+A good summary of multiple testing correction in high throughput genomics experiments can be found [here](https://www.nature.com/articles/nbt1209-1135). An excellent video describing the FDR-based methods can be found [here](https://www.youtube.com/watch?v=K8LQSvtjcEo&ab_channel=StatQuestwithJoshStarmer) by StatQuest.
 
-> FDR correction is often facvourable in RNA-seq differential expression analysis as we are often interested in being less conservative and generating new hypothesis. DESeq2 performs multiple testing correction by default using FDR correction. We will demonstrate how the corrected P-values can be extracted from the results in a following lesson.
+> FDR correction is often favourable in RNA-seq differential expression analysis as we are often interested in being less conservative and generating new hypothesis. DESeq2 performs multiple testing correction by default using FDR correction. We will demonstrate how the corrected P-values can be extracted from the results in a following lesson.

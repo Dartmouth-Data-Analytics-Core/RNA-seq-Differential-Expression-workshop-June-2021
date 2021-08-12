@@ -13,6 +13,9 @@ TO DO:
 
 Load the DESeq2 dataset:
 ```r
+# set working directory (YOU MAY NEED TO CHANGE THIS PATH)
+setwd('~/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/')
+
 # read in the RDS object
 dds <- readRDS("DESeq2.rdata")
 ```
@@ -22,6 +25,9 @@ Load required R-packages:
 library(ggplot2)
 library(DESeq2)
 library(pheatmap)
+library(ComplexHeatmap)
+library(RColorBrewer)
+library(circlize)
 ```
 
 ### Introduction
@@ -345,7 +351,7 @@ ht1 = Heatmap(mat1,
               top_annotation = c(ha1),
               bottom_annotation = c(ha),
               show_row_names = FALSE,
-              show_col_names = FALSE)
+              show_column_names = FALSE)
 
 # plot the heatmap
 draw(ht1, row_title = "Genes", column_title = "Top 500 most variable genes")
