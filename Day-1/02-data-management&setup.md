@@ -182,5 +182,5 @@ dds@colData
 Lets save the DESeq2 object at this point (so that we don’t have to do the above everytime we want to work with our data).
 
 ```r
-save(dds, file = "DESeq2.rdata")
+saveRDS(dds, file = "DESeq2.rdata")
 ```
