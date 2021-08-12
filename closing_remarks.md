@@ -1,17 +1,19 @@
 # Closing remarks
 
-### Workshop goals:
-- Understand the basic principles of a differential expression analysis using RNA-seq data
-- Develop a working understanding of the fundamental statistics behind a typical differential expression analysis using R/Bioconductor packages
-- Perform a differential expression analysis using R/Bioconductor packages
+## Workshop goals:
+- Understand the basic principles of a differential expression (DE) analysis using RNA-seq data
+- Develop a working understanding of the fundamental statistics fro typical DE analysis methods
+- Perform a DE analysis using R/Bioconductor packages
 - Learn how to explore the results and make robust insights from your data
 
-### DE analysis overview
+----------
+
+## DE analysis overview
 ![](figures/day2_summary.png)
 
 ----------
 
-### Final take-aways from the workshop
+## Final take-aways from the workshop
 - Spend the time to plan your experiment well (enough replicates, appropriate sequencing depth, etc.). No analysis can rescue a bas dataset.
 
 - If you will perform differential expression analysis regularly, you should build your experience in R, as well as you knowledge of fundamental statistical concepts
@@ -22,7 +24,7 @@
 
 ----------
 
-### How to consolidate your learning:
+## How to consolidate your learning:
 - Revisit the workshop materials a week or two after the workshop, and re-run the analysis code from scratch
 
 - Edit/annotate the code, run sub-sections, and read the `help` pages for important functions
@@ -35,11 +37,11 @@
 
 ----------
 
-### Post DE analysis
+## Post DE analysis
 
 After completing a DE analysis, we are usually left with a handful of genes that we wish to extract further meaning from. Depending on our hypothesis and what data is available to us, there are several ways to do this.
 
-#### 1. Integrative genomics
+### 1. Integrative genomics
 
 If you also collected other genomic data of a different modality ion the same samples (e.g. WGS-/WES, ChIP-seq, ATAC-seq), or an appropriate public dataset exists, you may choose to integrate your DE results with these data. This approach is referred to as *integrative genomics* and allows you to make insights that you would be unable to with a single data type.
 
@@ -49,7 +51,7 @@ For example, if you collected ChIP-seq for a specific transcription factor (TF) 
   <img src="figures/int-gen.png" height="80%" width="80%"/>
 </p>
 
-#### 2. Gene ontology (GO) & pathway analyses
+### 2. Gene ontology (GO) & pathway analyses
 Unless very few significant DEGs were identified in your analysis, it can be difficult to extract biological insights from a long list of genes. GO and pathway analysis methods represent a diverse collection of approaches that seek to prioritize sets of functionally related genes that are enriched in a list of DEGs.
 
 <p align="center">
@@ -69,7 +71,7 @@ Some suggested reading regarding gene ontology and pathway analysis approaches:
 
 -----------
 
-### Feedback
+## Feedback
 
 We ask that you complete the survey that will be sent out over email so that we can gauge what worked well, and what we need to improve for the future. If you have additional thoughts that were not addressed in the survey, please feel free to contact any one of us, or reach out to the DAC email directly (*DataAnalyticsCore@groups.dartmouth.edu*).
 
@@ -77,8 +79,10 @@ We ask that you complete the survey that will be sent out over email so that we 
 
 This workshop will be offered again, in addition to our other bioinformatics workshop offerings (details will be posted on [CQB website](https://sites.dartmouth.edu/cqb/)). If you have suggestions for workshops you would like to see, please let us know!
 
-### Bioinformatics office hours & consultations
+---------
+
+## Bioinformatics office hours & consultations
 
 Please reach out to us with questions related to content from this workshop, or for analysis consultations. We also host **bioinformatics office hours** on **Fridays 1-2pm** for general questions and inquiries (currently on Zoom: https://dartmouth.zoom.us/s/96998379866, password: *bioinfo*)
 
-#### Now.... Discussion/question time!
+### Now.... Discussion/question time!
