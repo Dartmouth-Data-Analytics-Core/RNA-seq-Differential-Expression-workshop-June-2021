@@ -15,12 +15,16 @@ library(DESeq2)
 
 Load the DESeq2 dataset we already generated:
 ```r
+# set working directory (YOU MAY NEED TO CHANGE THIS PATH)
+setwd('~/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/')
+
+# load DESeq dataset
 dds <- readRDS("DESeq2.rdata")
 ```
 
 ### Introduction
 
-Our exploratory data analysis indicated that Control and Dexamethasone treated samples cluster together, suggesting consistent gene expression profiles between the replicates. In contrast, Alb and co-treated samples did not cluster together, suggesting less consistency between replicates.
+Our exploratory data analysis indicated that Control and Dexamethasone treated samples cluster together respectively, suggesting consistent gene expression profiles between the replicates within conditions. In contrast, Alb and co-treated samples did not cluster by treatment, suggesting less consistency between replicates within conditions.
 
 Based on these observations, a DE analysis of Control vs Dex is likely to have the most statistical power, therefore we will focus on this comparison in the following analysis. The image below highlights the main steps that will be involved in the DE analysis, and the functions that perform these steps in DESeq2.
 
@@ -69,7 +73,7 @@ hist(counts(dds, normalized=FALSE)[,5],
 	title="" width="80%" height="80%" />
 </p>
 
-As is obvious from the histogram, most genes with very low count values, with relatively few demonstrating higher expression levels. This plot highlights the extremely large dynamic range of RNA-seq data.
+As is obvious from the histogram, most genes have very low count values, with relatively few demonstrating higher expression levels. This plot highlights the extremely large dynamic range of RNA-seq data.
 
 Importantly, the data is obviously **not** normally distributed, therefore any statistical model based on the normal distribution (e.g. t-test) is not appropriate for DE testing. By looking again at the matrix of raw counts, it is clear that RNA-seq is integer count data, therefore we should use a statistical model for count-based data.
 
@@ -85,7 +89,7 @@ Importantly, the Poisson distribution assumes `mean == variance`. `mean` and `va
 - `mean` - the average count of a gene across replicates
 - `variance` - the average deviation from the mean across replicates
 
-To see if our RNA-seq data meets this assumption, we can plot the `mean` vs the `variance` for a set of replicates in our dataset:
+To see if our RNA-seq data meets this assumption (and we should apply a poisson distribution), we can plot the `mean` vs the `variance` for a set of replicates in our dataset:
 
 ```r
 # calculate mean and variance for group of replicates
@@ -115,7 +119,7 @@ Additionally, we see there is more difference between the variances of genes wit
 
 ### Part 3: Modeling RNA-seq data
 
-RNA-seq data clearly violate the key assumption of the poisson distribution `mean == variance`, therefore we an alternate distribution that accounts for **overdispersion**. One solution is to use a generalization of the *Poisson distribution* called the **negative-binomial (NB) distribution** which includes a **dispersion parameter** that describes the amount the variance exceeds the mean for genes of a particular expression level.
+RNA-seq data clearly violate the key assumption of the poisson distribution `mean == variance`, therefore we use an alternate distribution that accounts for **overdispersion**. One solution is to use a generalization of the *Poisson distribution* called the **negative-binomial (NB) distribution** which includes a **dispersion parameter** that describes the amount the variance exceeds the mean for genes of a particular expression level.
 
 We can plot a few randomly generated NB distributions with different dispersions to examine how the dispersion parameter affects the spread of the data.
 
@@ -123,17 +127,17 @@ We can plot a few randomly generated NB distributions with different dispersions
 # set the plotting window to 3 rows and 1 column
 par(mfrow=c(3,1))
 
-### dispersion = 10
+### dispersion = 0.001
 hist(rnbinom(n = 10000, mu = 100, size = 1/0.001),
      xlim = c(0, 300), xlab = "", breaks = 500,
      main = " Dispersion 0.001")
 
-### dispersion = 10
+### dispersion = 0.01
 hist(rnbinom(n = 10000, mu = 100, size = 1/0.01),
      xlim = c(0, 300), xlab = "", breaks = 500,
      main = " Dispersion 0.01")
 
-### dispersion = 10
+### dispersion = 0.1
 hist(rnbinom(n = 10000, mu = 100, size = 1/0.1),
      xlim = c(0, 300), xlab = "", breaks = 500,
      main = " Dispersion 0.1")
@@ -147,8 +151,7 @@ hist(rnbinom(n = 10000, mu = 100, size = 1/0.1),
 > This example for plotting NB distributions was adapted from the *Data Analysis for the Life Sciences series* available on edX and at
 [rafalab](https://rafalab.github.io/pages/harvardx.html), and is an excellent resource to learn more about how we model RNA-seq data for differential expression analysis.
 
-Clearly, as the dispersion parameter increases, variation around the
-mean also increases. To model RNA-seq data using the negative binomial distribution, we must therefore estimate a dispersion parameter for each gene in the dataset.
+Clearly, as the dispersion parameter increases, variation around the mean also increases. To model RNA-seq data using the negative binomial distribution, we must therefore estimate a dispersion parameter for each gene in the dataset.
 
 The mean, variance, and dispersion are linked by the equation:  
 `variance = mean + dispersion x 2 mean-squared ( var = mu + disp. * mu^2)`
@@ -171,8 +174,7 @@ To improve the raw gene-level estimates of dispersion, `DESeq2` uses a statistic
 1. the number of samples in the group under consideration (more replicates -> less shrinkage)  
 2. how far the initial dispersion is from the prior mean
 
-In the above dispersion plot, raw dispersion estimates are shrunk towards the *prior mean* (fitted curve in red) to a final MAP estimate. For dispersion estimates further away from the line, you can see that their estimates are shrunk more than those are are originally closer to the line. This procedure generates **more accurate estimates of dispersion** as it
-shares information across genes with similar expression levels.
+In the above dispersion plot, raw dispersion estimates are shrunk towards the *prior mean* (fitted curve in red) to a final MAP estimate. For dispersion estimates further away from the line, you can see that their estimates are shrunk more than those are are originally closer to the line. This procedure generates **more accurate estimates of dispersion** as it shares information across genes with similar expression levels.
 
 #### Review dispersion estimates for your dataset
 
@@ -195,18 +197,10 @@ to two features:
 - the final estimates are well scattered around the fitted line
 - the dispersion trend decreases with increasing mean expression.
 
-If the dispersion plot showed more structure, we would be
-concerned that the model is not estimating dispersions well for our
-data, indicating something may be wrong with the dataset, e.g. outlier
-samples, a batch effect, low quality samples/data, potential
-contamination etc.
+If the dispersion plot showed more structure, we would be concerned that the model is not estimating dispersions well for our data, indicating something may be wrong with the dataset, e.g. outlier samples, a batch effect, low quality samples/data, potential contamination etc.
 
 **Take home message on dispersion estimates:**   
-Confirm your dispersion estimates are well
-calibrated before performing your DE analysis, as
-accurate estimation of dispersion is critical in controlling the
-false-positive rate in experiments with smaller sample sizes (i.e. most
-RNA-seq experiments)**.
+Confirm your dispersion estimates are well calibrated before performing your DE analysis, as accurate estimation of dispersion is critical in controlling the false-positive rate in experiments with smaller sample sizes (i.e. most RNA-seq experiments)**.
 
 ------------------------------------------------------------------------
 
@@ -215,15 +209,11 @@ RNA-seq experiments)**.
 
 Now that we know which distribution we will assume for our data, we are ready to begin fitting models and testing for differential expression.
 
-In a previous lesson, we introduced **generalized linear models (GLM)**, a
-family of statistical models that generalize standard linear regression
-in two ways:  
+In a previous lesson, we introduced **generalized linear models (GLM)**, a family of statistical models that generalize standard linear regression in two ways:  
 - use of probability distributions other than the normal distribution
-- use of a *link-function* that connects the expression values in the
-linear model to the experimental groups
+- use of a *link-function* that connects the expression values in the linear model to the experimental groups
 
-Since we are are assuming our raw counts follow a negative-binomial (NB)
-distribution, the GLM we will fit is of the NB family of GLMs.
+Since we are are assuming our raw counts follow a negative-binomial (NB) distribution, the GLM we will fit is of the NB family of GLMs.
 
 #### The DESeq2 model:
 
@@ -238,7 +228,7 @@ Briefly, the model denotes that the raw counts are modeled using a NB distributi
 
 By fitting the model using the raw counts, dispersion estimates, and size factors for each gene, we obtain a set of **model coefficients** for each sample group, which can be interpreted as the **log2 fold-change** in expression for that gene between the baseline group and each comparison group.
 
-This coefficient, and the confidence associated with it (the standard error) can be used to in **hypothesis testing** to calculate a **P-value.** DESeq2 uses the *Wald-test* to perform hypothesis testing, with the null hypothesis that *the log2 fold-change between experimental groups for an individual gene is not significantly different from 0* (no change in expression). This process is depcited in the figure below.
+This coefficient, and the confidence associated with it (the standard error) can be used in **hypothesis testing** to calculate a **P-value**. DESeq2 uses the *Wald-test* to perform hypothesis testing, with the null hypothesis that *the log2 fold-change between experimental groups for an individual gene is not significantly different from 0* (no change in expression). This process is depcited in the figure below.
 
 <p align="center">
 <img src="../figures/wald-test.png" alt="overview"
@@ -273,7 +263,7 @@ resultsNames(dds)
 
 # get results for DEG analysis (and order by Pval) by specifying design
 res <- results(dds,
-  name = "group_Dex_vs_untreated",
+  name = "tx.group_Dex_vs_untreated",
   alpha = 0.05)
 
 # check dminesions on tables
@@ -320,9 +310,9 @@ head(res_ord)
 | ENSG00000182010 | 104.2058  | -1.897678      | 0.361016  | -5.25649  | 1.47E-07  | 6.45E-04  |
 | ENSG00000134253 | 139.3307  | -1.965796      | 0.382335  | -5.14155  | 2.72E-07  | 6.77E-04  |
 
-Now we can review the genes that are of most interest to us, that is, those with small significance values. Note the we sorted on the adjusted P-values column `padj`, NOT the raw P-values column `pvalue`. As discussed previously, we are conducting thousands of tests, and must correct for the multiple testing problem.
+Now we can review the genes that are of most interest to us, that is, those with small adjusted p-values (most significant). Note the we sorted on the adjusted P-values column `padj`, NOT the raw P-values column `pvalue`. As discussed previously, we are conducting thousands of tests, and must correct for the multiple testing problem.
 
-`padj` provides us with Benjamini and Hochberg adjusted P-values that are corrected for multiple testing. If we were to use the `pvalue` column to select differentially expressed genes, we would make many false-positive findings.
+`padj` provides us with Benjamini and Hochberg adjusted P-values that are corrected for multiple testing. If we were to use the `pvalue` column to select differentially expressed genes, we would make many false-positive findings (type I errors).
 
 We could also use the results table to get more detail on our results, for example, determine how many genes fall under particular significance thresholds.
 
@@ -346,7 +336,7 @@ sum(res$padj < 0.05, na.rm=TRUE)
 
 As expected, the more conservative method leads to fewer statistically significant results at the same P-value threshold.
 
-> Remember, P-value thresholds do not need to be set at 5% for every experiment, you can be more or less conservative deoendning on the nature of your experiment.
+> Remember, P-value thresholds do not need to be set at 5% for every experiment, you can be more or less conservative dependning on the nature of your experiment.
 
 ---------
 
@@ -403,7 +393,7 @@ abline(v=metadata(res_ord)$filterTheta)
 
 Any gene with a mean expression value below the red line (the mean count value 1 standard deviation below where the maximum number of rejections was obtained) will have their `padj` values set to NA, and discarded during multiple testing correction.
 
-Its worth removing the genes assigned a `padj` value of `NA` due to indeoendent filtering in order to make our lives easier processiung the results downstream.
+Its worth removing the genes assigned a `padj` value of `NA` due to independent filtering in order to make our lives easier processing the results downstream.
 ```r
 res_ord <- res_ord[!is.na(res_ord$padj),]
 ```
