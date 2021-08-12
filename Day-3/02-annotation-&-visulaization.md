@@ -202,106 +202,63 @@ Food for thought: detecting truly differentially expressed genes is dependent on
 
 ### Other visualizations - MA plots
 
-MA plots are also useful ways to visualize results from a DE analysis of
-RNA-seq data. These involve plotting the log2 fold-change (the so called
-M-value, representing the *M* in *MA-plot*) against the average
-expression level of a gene (the *A* in *MA-plot*).
+MA plots are also useful ways to visualize results from a DE analysis of RNA-seq data. These involve plotting the log2 fold-change (the so called M-value, representing the *M* in *MA-plot*) against the average expression level of a gene (the *A* in *MA-plot*).
 
-The MA-plot allows us to inspect the **full range of expression values
-over which we detected significant DEGs, and what the magnitude of these
-fold-changes is**. In a typical experiment, we expect to see DEGs across
-most of the range of expression values. To help identify genes that were
-significantly DE, any gene with an adjusted P-value of &lt; 0.05 (or
-whatever threshold is set) is colored in red.
+The MA-plot allows us to inspect the **full range of expression values over which we detected significant DEGs, and what the magnitude of these fold-changes is**. In a typical experiment, we expect to see DEGs across most of the range of expression values. To help identify genes that were significantly DE, any gene with an adjusted P-value of &lt; 0.05 (or whatever threshold is set) is colored in red.
 
 ```r
     plotMA(res_ord, ylim=c(-6,6), main = "Raw Log2 Fold change")
 ```
 
-The **log2 fold-change** plotted above is the raw LFC value estimated by
-the negative binomial GLM that we used in modeling. However, as we
-discussed above, the individual estimates of variance or dispersion for
-a single gene are often unreliable, and this holds true
-`log2 fold change` also.
+The **log2 fold-change** plotted above is the raw LFC value estimated by the negative binomial GLM that we used in modeling. However, as we discussed above, the individual estimates of variance or dispersion for a single gene are often unreliable, and this holds true `log2 fold change` also.
 
-**To obtain more useful LFC estimates,** `DESeq2` performs a statsitical
-procedure that involves **shrinking the raw fold change estimates toward
-zero** for genes that are less likely to contain reliable or highly
-important information.
+**To obtain more useful LFC estimates,** `DESeq2` performs a statsitical procedure that involves **shrinking the raw fold change estimates toward zero** for genes that are less likely to contain reliable or highly important information.
 
-This is done in a very similar way to the shrinkage using empirical
-bayes that we discussed for the **dispersion estimates**.
+This is done in a very similar way to the shrinkage using empirical bayes that we discussed for the **dispersion estimates**.
 
-**For shrinking LFC values, LFCs are penalized for properties such as:
-**  
+**For shrinking LFC values, LFCs are penalized for properties such as:**  
 - low count values  
 - high dispersion (& thus reduced confidence in expression levels)
 
-DESeq2 provides a function `lfcShrink()` that must be implemented
-separately of the standard workflow implemented using `DESeq2()`.
+DESeq2 provides a function `lfcShrink()` that must be implemented separately of the standard workflow implemented using `DESeq2()`.
 
 ```r
-    # calculate shrunken fold change estimate
-    res_shrink <- lfcShrink(dds,
-                        coef=paste0(resultsNames(dds)[which(resultsNames(dds)=="group_Dex_vs_untreated")]),
-                        type="apeglm")
+# calculate shrunken fold change estimate
+res_shrink <- lfcShrink(dds,
+                     coef=paste0(resultsNames(dds)[which(resultsNames(dds)=="tx.group_Dex_vs_untreated")]),
+                     type="apeglm")
 ```
 
-After performing the shrinkage procedure, we compare the raw and
-shrunken LFCs to assess the impact of shrinkage.
+After performing the shrinkage procedure, we compare the raw and shrunken LFCs to assess the impact of shrinkage.
 
 **Raw estimates of log2 FC:**
 
 ```r
-    plotMA(res_ord, ylim=c(-6,6), main = "Raw Log2 Fold change")
+par(mfrow=c(2,1))
+plotMA(res_ord, ylim=c(-6,6), main = "Raw Log2 Fold change")
 ```
 
 **Shrunken estimates of log2 FC:**
 
 ```r
-    plotMA(res_shrink, ylim=c(-6,6), main = "Shrunken Log2 Fold change")
+plotMA(res_shrink, ylim=c(-6,6), main = "Shrunken Log2 Fold change")
 ```
 
-We can see that **significantly DE genes are detected across the full
-range of expression values** (x-axis), which is a good sign that our
-differential expression modeling has worked well. We can also see that
-we have a handful of genes with larger expression values (&gt; LFC 2)
-which potentially represent the most important individual genes, while
-the majority of our DEGs have a LFC &lt; 1.5 (ish).
+We can see that **significantly DE genes are detected across the full range of expression values** (x-axis), which is a good sign that our differential expression modeling has worked well. We can also see that we have a handful of genes with larger expression values (&gt; LFC 2) which potentially represent the most important individual genes, while the majority of our DEGs have a LFC &lt; 1.5 (ish).
 
-Comparing to the raw LFCs, we can also see that the **majority of genes
-with lower expression values have have their LFCs shrunk toward zero**.
-This is important as genes with low counts may simply end up with a
-large LFC since this is easy to do at small count values, but these are
-unlikely to be accurate fold-changes, so we don’t want to prioritize
-their importance by giving them a large LFC.
+Comparing to the raw LFCs, we can also see that the **majority of genes with lower expression values have have their LFCs shrunk toward zero**. This is important as genes with low counts may simply end up with a large LFC since this is easy to do at small count values, but these are unlikely to be accurate fold-changes, so we don’t want to prioritize their importance by giving them a large LFC.
 
-It’s always good to look at the shrunken estimates, to confirm that you
-don’t have a lot of DEGs at very small count values. If you do, you may
-want to look at the expression levels for those genes to investigate
-these findings in more detail.
+It’s always good to look at the shrunken estimates, to confirm that you don’t have a lot of DEGs at very small count values. If you do, you may want to look at the expression levels for those genes to investigate these findings in more detail.
 
-**As the mean or counts increase, it is evident that the level of
-shrinkage is less**, although may still be high for genes with greater
-dispersion estimates. As we move toward the more highly expessed genes,
-you can see how more genes at lower fold change values are able to be
-identified as significant, which is due to the fact that there is more
-information avaiable for these genes, so we can be more confident during
-hypothesis tetsing of these genes.
+**As the mean or counts increase, it is evident that the level of shrinkage is less**, although may still be high for genes with greater dispersion estimates. As we move toward the more highly expessed genes, you can see how more genes at lower fold change values are able to be identified as significant, which is due to the fact that there is more information avaiable for these genes, so we can be more confident during hypothesis tetsing of these genes.
 
-**Note:** This shrinkage does not really change the hypothesis testing,
-therefore is performed independently, as is for use in prioritizing your
-results further for visual inspection or some sort of functional
-analysis (e.g. pathway analysis).
+**Note:** This shrinkage does not really change the hypothesis testing, therefore is performed independently, as is for use in prioritizing your results further for visual inspection or some sort of functional analysis (e.g. pathway analysis).
 
 ------------------------------------------------------------------------
 
 #### Hierachical clustering on the DEGs
 
-A final visualization that is useful to generate is a heatmap based on
-unsupervised hierachical clustering of the DEGs identified. We can do
-this by limiting the matrix of rlog values to only those for the DEGs,
-and then performing the clustering specifically on these data.
+A final visualization that is useful to generate is a heatmap based on unsupervised hierachical clustering of the DEGs identified. We can do this by limiting the matrix of rlog values to only those for the top XX DEGs, and then performing the clustering specifically on these data.
 
 ```r
     rld <- rlog(dds, blind = FALSE)
