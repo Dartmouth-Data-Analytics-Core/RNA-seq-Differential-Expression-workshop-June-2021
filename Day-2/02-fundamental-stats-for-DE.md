@@ -1,4 +1,5 @@
 TOI DO:
+- add table on test-statitics 
 - add R packages to load to setup
 
 # 02 - Fundamental statistics for Differential Expression analysis
