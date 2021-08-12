@@ -1,7 +1,6 @@
 To do:
 - add learning objectives
 - reduce overall text where possible
-- change paths to figures folder so that figures are shown in markdown
 
 
 # Results annotation & visualization
