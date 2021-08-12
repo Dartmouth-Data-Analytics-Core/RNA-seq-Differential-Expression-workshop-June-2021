@@ -28,19 +28,7 @@ The figure below provides an outline of the major setps in a standard DE analysi
 Lets start by loading the packages we will need:
 
 ```r
-library(dplyr)
-library(ggplot2)
-library(tximport)
 library(DESeq2)
-library(biomaRt)
-library(vsn)
-library(pheatmap)
-library(gplots)
-library(RColorBrewer)
-library(ComplexHeatmap)
-library(circlize)
-library(xtable)
-library(kableExtra)
 ```
 
 Set your working directory to the location of the workshop folder on your local machine:
