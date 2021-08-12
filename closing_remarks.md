@@ -46,14 +46,14 @@ If you also collected other genomic data of a different modality ion the same sa
 For example, if you collected ChIP-seq for a specific transcription factor (TF) with paired RNA-seq data, you may wish to use your significant DEGs to identify genes whose expression is turned on/off by this TF under a treatment condition.
 
 <p align="center">
-  <img src="../figures/int-gen.png" height="80%" width="80%"/>
+  <img src="figures/int-gen.png" height="80%" width="80%"/>
 </p>
 
 #### 2. Gene ontology (GO) & pathway analyses
 Unless very few significant DEGs were identified in your analysis, it can be difficult to extract biological insights from a long list of genes. GO and pathway analysis methods represent a diverse collection of approaches that seek to prioritize sets of functionally related genes that are enriched in a list of DEGs.
 
 <p align="center">
-  <img src="../figures/go-methods.png" height="80%" width="80%"/>
+  <img src="figures/go-methods.png" height="80%" width="80%"/>
 </p>
 
 Many tools and methodologies exist for performing GO & pathway enrichment analysis. These tools make use of varied statistical approaches, some of which were designed for specific applications (such as for microarray data, not RNA-seq, e.g. GSEA), therefore selecting the most appropriate tool for your analysis can be non-trivial. We encourage you to read more about these methods and review your analysis plan with an expert if you plan to use these in you research.
