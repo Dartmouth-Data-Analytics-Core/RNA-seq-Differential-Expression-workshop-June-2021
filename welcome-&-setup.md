@@ -106,6 +106,11 @@ if (!any(rownames(installed.packages()) == "readr")){
 }
 library(readr)
 
+if (!any(rownames(installed.packages()) == "ggrepel")){
+      install.packages("ggrepel")
+}
+library(ggrepel)
+
 if (!any(rownames(installed.packages()) == "rlang")){
   if (!requireNamespace("BiocManager", quietly = TRUE))
       install.packages("BiocManager")
