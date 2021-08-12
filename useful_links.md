@@ -25,6 +25,8 @@
 
 - [R markdown](./misc/cheat-sheets/rmarkdown-2.0.pdf)  
 
+-----------
+
 ## Differential expression analysis tools
 
 - [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html), original manuscript: [Love et al, 2014](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8)  
