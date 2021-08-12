@@ -1,7 +1,5 @@
 To do:
 - add learning objectives
-- confirm code works with current directory structure
-- adapt text so that this markdown reads appropriately as a standalone section
 - reduce overall text where possible
 - change paths to figures folder so that figures are shown in markdown
 
@@ -95,6 +93,9 @@ The fold-change value of genes with non-significant fold changes is not meaningf
     abline(h=-log10(0.05), lty = 2, col = "black") # nominal P-value
 ```
 
+
+![](../figures/volcano1.png)
+
 Here we can clearly see that there are quite a few genes above our significance threshold in both the up and downregulation directions (negative and positive fold changes), that also have absolute log2 fold change values of at least 2 or more. Of particular interest, there seem to be a few genes with very large fold change values & -log10 P-values, making them especially interesting as their effect size is large AND our confidence in this fold change is good.
 
 It is a little hard to make specific inferences from this plot at the individual gene level, so some labels for interesting data points ( and some colors) would definitely improve this volcano plot, and make it more informative. We will use the **ggpolot2** R package to do this, and we will color each point based on a combination of fold change and P-value, as these determine which genes are of most interest to us.
@@ -153,6 +154,8 @@ It is a little hard to make specific inferences from this plot at the individual
 
 ```
 
+![](../figures/volcano2.png)
+
 This is nice, but some labels for potentially interesting genes would be useful. Lets add some using the **ggrepel** package.
 
 ```r
@@ -183,6 +186,8 @@ This is nice, but some labels for potentially interesting genes would be useful.
     print(p2)
 ```
 
+![](../figures/volcano3.png)
+
 This looks a lot better, and gives us a lot more information than the first, very basic plot we generated.
 
 Food for thought: detecting truly differentially expressed genes is dependent on the technical variance between your replicates. If the technical variance is high, you generally need a large fold-change to achieve statistical significance. The more replicates you have, the more you are able to reduce this technical variance, which increases your statistical power, and enables you to confidently detect differential expression of smaller fold changes. For example, for an experiment where there are 300 truly differentially expressed genes between your conditions, you may detect 200 of these with 3 replicates, while you may detect 250 with 5 replicates.
@@ -209,6 +214,7 @@ The MA-plot allows us to inspect the **full range of expression values over whic
 ```r
     plotMA(res_ord, ylim=c(-6,6), main = "Raw Log2 Fold change")
 ```
+![](../figures/raw_MAplot.png)
 
 The **log2 fold-change** plotted above is the raw LFC value estimated by the negative binomial GLM that we used in modeling. However, as we discussed above, the individual estimates of variance or dispersion for a single gene are often unreliable, and this holds true `log2 fold change` also.
 
@@ -243,6 +249,7 @@ plotMA(res_ord, ylim=c(-6,6), main = "Raw Log2 Fold change")
 ```r
 plotMA(res_shrink, ylim=c(-6,6), main = "Shrunken Log2 Fold change")
 ```
+![](../figures/MAplots.png)
 
 We can see that **significantly DE genes are detected across the full range of expression values** (x-axis), which is a good sign that our differential expression modeling has worked well. We can also see that we have a handful of genes with larger expression values (&gt; LFC 2) which potentially represent the most important individual genes, while the majority of our DEGs have a LFC &lt; 1.5 (ish).
 
@@ -297,3 +304,5 @@ A final visualization that is useful to generate is a heatmap based on unsupervi
     # plot the heatmap
     draw(ht1, row_title = "Genes", column_title = "Hierachical clustering of DEGs (padj<0.05)")
 ```
+
+![](../figures/heatmap.png)
