@@ -14,8 +14,8 @@
 If you started a new R session, you must load in the `DESeq2` object we created in the previous lesson, which contains the counts and sample metadata.
 
 ```r
-# read in the RDS object
-dds <- readRDS("DESeq2.rdata")
+# load in the R object
+dds <- load("DESeq2.rdata")
 ```
 
 As we saw in the last lesson, the `counts()` function can be used to extract the matrix of raw read counts from the DESeq2 object:
