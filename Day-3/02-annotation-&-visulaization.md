@@ -24,16 +24,11 @@ library(xtable)
 library(kableExtra)
 ```
 
-We want to also add the annotation data for each gene (symbol, genome
-coordinates, etc.) to the results. Since we used Ensembl version 97 to
-annotate these data, we need to use the Ensembl 97 annotation data to
-annotate these results. We can obtain this for our species of interest
-in a flat file format using the [BioMart on the Ensembl
-website](http://uswest.ensembl.org/biomart/martview/b0399bb192186dea3aedf87d82a4580c).
+We want to also add the annotation data for each gene (symbol, genome coordinates, etc.) to the results. Since we used Ensembl version 97 to annotate these data, we need to use the Ensembl 97 annotation data to annotate these results. We can obtain this for our species of interest in a flat file format using the [BioMart on the Ensembl website](http://uswest.ensembl.org/biomart/martview/b0399bb192186dea3aedf87d82a4580c).
 
 ```r
     # read in the flat file we downloaded and have a look at it
-    anno <- read.delim("Day-2/GRCh38.p12_ensembl-97.txt", stringsAsFactors = T, header = T)
+    anno <- read.delim("data/GRCh38.p12_ensembl-97.txt", stringsAsFactors = T, header = T)
     anno <- anno[order(anno$Chromosome.scaffold.name),]
     dim(anno)
 
@@ -49,9 +44,7 @@ Lets have a look at the Chromosome distribution of features
     tab1[1:22]
 ```
 
-Lets also quickly check that nothing is duplicated in the ENSG ID column
-of our annotation, as this would cause problems when merging with our
-results.
+Lets also quickly check that nothing is duplicated in the ENSG ID column of our annotation, as this would cause problems when merging with our results.
 
 ```r
     any(duplicated(anno$Gene.stable.ID))
@@ -70,8 +63,7 @@ Now lets add the annotation for each gene name directly to the results.
 
 ```
 
-Lets also add some other columns that might be of interest to us when
-reviewing the results.
+Lets also add some other columns that might be of interest to us when reviewing the results.
 
 ```r
     res_ord$chr <- as.character(anno$Chromosome.scaffold.name[mat1])
@@ -86,25 +78,11 @@ reviewing the results.
 
 #### Volcano plot
 
-Volcano plots are a useful visualization for exploring your results, the
-**log2 fold change** (x-axis) is plotted against the **-log10 P-value**.
-Since the -log10() of a really small number is a very large value, any
-gene that has a very small P-value and was significantly differentially
-expressed, will appear higher up along the y-axis. In contrast, the
--log10 of 1 (`-log10(1)`) is equal to `0`, therefore genes with low
-statistical significance (P-values approaching 1) will appear lower down
-on the y-axis.
+Volcano plots are a useful visualization for exploring your results, the **log2 fold change** (x-axis) is plotted against the **-log10 P-value**. Since the -log10() of a really small number is a very large value, any gene that has a very small P-value and was significantly differentially expressed, will appear higher up along the y-axis. In contrast, the -log10 of 1 (`-log10(1)`) is equal to `0`, therefore genes with low statistical significance (P-values approaching 1) will appear lower down on the y-axis.
 
-Similarly, genes with larger fold changes will appear further along the
-x-axis, in both directions. Genes with a positive fold change represent
-genes whose expression was greater than the group of the experimental
-design variable used as baseline, while genes with a negative fold
-change represent genes whose expression was lower than in the baseline
-group.
+Similarly, genes with larger fold changes will appear further along the x-axis, in both directions. Genes with a positive fold change represent genes whose expression was greater than the group of the experimental design variable used as baseline, while genes with a negative fold change represent genes whose expression was lower than in the baseline group.
 
-The fold-change value of genes with non-significant fold changes is not
-meaningful, as there is not enough statistical confidence in these fold
-changes.
+The fold-change value of genes with non-significant fold changes is not meaningful, as there is not enough statistical confidence in these fold changes.
 
 ```r
     plot(res$log2FoldChange, -log10(res$pvalue),
@@ -117,20 +95,9 @@ changes.
     abline(h=-log10(0.05), lty = 2, col = "black") # nominal P-value
 ```
 
-Here we can clearly see that there are quite a few genes above our
-significance threshold in both the up and downregulation directions (+ve
-and -ve fold changes), that also have absolute log2 fold change values
-of at least 2 or more. Of particular interest, there seem to be a few
-genes with very large fold change values & -log10 P-values, making them
-especially interesting as their effect size is large AND our confidence
-in this fold change is good.
+Here we can clearly see that there are quite a few genes above our significance threshold in both the up and downregulation directions (negative and positive fold changes), that also have absolute log2 fold change values of at least 2 or more. Of particular interest, there seem to be a few genes with very large fold change values & -log10 P-values, making them especially interesting as their effect size is large AND our confidence in this fold change is good.
 
-It is a little hard to make specific inferences from this plot at the
-individual gene level, so some labels for interesting data points ( and
-some colors) would definitely improve this volcano plot, and make it
-more informative. We will use the **ggpolot2** R package to do this, and
-we will color each point based on a combination of fold change and
-P-value, as these determine which genes are of most interest to us.
+It is a little hard to make specific inferences from this plot at the individual gene level, so some labels for interesting data points ( and some colors) would definitely improve this volcano plot, and make it more informative. We will use the **ggpolot2** R package to do this, and we will color each point based on a combination of fold change and P-value, as these determine which genes are of most interest to us.
 
 ```r
     # save a dataframe from the results() output
@@ -186,8 +153,7 @@ P-value, as these determine which genes are of most interest to us.
 
 ```
 
-This is nice, but some labels for potentially interesting genes would be
-useful. Lets add some using the **ggrepel** package.
+This is nice, but some labels for potentially interesting genes would be useful. Lets add some using the **ggrepel** package.
 
 ```r
     p2 <- p +
@@ -217,19 +183,9 @@ useful. Lets add some using the **ggrepel** package.
     print(p2)
 ```
 
-This looks a lot better, and gives us a lot more information than the
-first, very basic plot we generated.
+This looks a lot better, and gives us a lot more information than the first, very basic plot we generated.
 
-Food for thought: detecting truly differentially expressed genes is
-dependent on the technical variance between your replicates. If the
-technical variance is high, you generally need a large fold-change to
-achieve statistical significance. The more replicates you have, the more
-you are able to reduce this technical variance, which increases your
-statistical power, and enables you to confidently detect differential
-expression of smaller fold changes. For example, for an experiment where
-there are 300 truly differentially expressed genes between your
-conditions, you may detect 200 of these with 3 replicates, while you may
-detect 250 with 5 replicates.
+Food for thought: detecting truly differentially expressed genes is dependent on the technical variance between your replicates. If the technical variance is high, you generally need a large fold-change to achieve statistical significance. The more replicates you have, the more you are able to reduce this technical variance, which increases your statistical power, and enables you to confidently detect differential expression of smaller fold changes. For example, for an experiment where there are 300 truly differentially expressed genes between your conditions, you may detect 200 of these with 3 replicates, while you may detect 250 with 5 replicates.
 
 **Save our results to .csv files**
 
@@ -242,94 +198,7 @@ detect 250 with 5 replicates.
     write.csv(as.data.frame(res_ord), file= "DE_results.csv")
     write.csv(as.data.frame(res_order_FDR_05), file="DE_results.FDR.0.05.csv")
 ```
-
-#### Why must we correct for multiple hypothesis testing?
-
-P-values are defined as the probability that we would observe a result
-as extreme as the one we observed, simply due to chance. In the case of
-RNA-seq, we are testing the probability that we would observe the log2
-FC that we do for a given gene, if this result is due to chance.
-Therefore if we use 0.05 as a P-value threshold, and we test 20,000
-genes for DE, this means that 5% of those genes we tested will have a
-log 2 FC that has a P-value &lt; 0.05 simply due to chance. 5% of 20,000
-is 1000 genes, which is obviously an unacceptable amount of
-false-positives.
-
-We address this problem through multiple testing correction. While
-several methods that control different aspects of the multiple testing
-problem, we commonly use methods that control the false-discovery rate
-(FDR) in RNA-seq DE experiments. Controlling the false discovery rate at
-10% means that we are accepting that 1 in 10 of the genes with a
-significant adjusted P-value, is actually a false-positive, and not
-truly differentially expressed. RNA-seq DE studies are usually
-hypothesis generating in nature, so this is usually an acceptable
-compromise, however if your experiment requires more stringency, you may
-wish to use a method that controls the family-wise error rate (FWER),
-such as **Bonferonni** correction.
-
-Lets work through an example to demonstrate the importance of multiple
-tetsing. We will create a dataset with scrambeled sample labels, so that
-the null hypothesis (there is no differential expression) is true for
-all the genes. How many genes with an unadjusted P-value &lt; 0.05 do
-you think we will get?
-
-```r
-    # create a new object and scramble the sample labels
-    dds2 <- dds
-
-    # take random sample without replacement to get a scrambeled design variable
-    colData(dds2)$group <- sample(colData(dds2)$group, length(colData(dds2)$group))
-
-    # check sample number in each group is the same
-    table(colData(dds)$group)
-
-    table(colData(dds2)$group)
-
-    # re-run the DEseq2 analysis using the new group variable as the design variable
-    dds2 <- DESeq(dds2)
-
-    # extract the DEG results just like before
-    res2 <- results(dds2,
-      name = "group_Dex_vs_untreated",
-      alpha = 0.05,
-      lfcThreshold = 0)
-
-    # drop the NA values in P-value column
-    res2 <- as.data.frame(res2)
-    res2 <- res2[-which(is.na(res2$padj)),]
-
-    # how many P-values < 0.05
-    sum(res2$pvalue < 0.05, na.rm=TRUE)
-
-    # how many FDR adjusted P-values < 0.05
-    sum(res2$padj < 0.05, na.rm=TRUE)
-
-    # how many with Bonferonni adjusted P-values < 0.05
-    sum(res2$pvalue < (0.05/nrow(res2)), na.rm=TRUE)
-
-    # plot the results
-    plot(res2$log2FoldChange, -log10(res2$pvalue),
-         main = "Volcano plot - DEG w/ scrambled sample labes",
-         las = 1, col = "cornflowerblue",
-         ylab = "- log10 P-value", xlab = "log2 Fold change", ylim = c(0,7))
-
-    # add significance lines
-    abline(h= -log10(0.05), lty = 2, col = "red") # nominal P-value
-    abline(h= -log10(0.05/nrow(res2)), lty = 2, col = "black") # Bonferonni
-```
-
-You can see that there are **minimal results with statistical
-signficance after correction**, which is true since we scrambled the
-sample labels and created a fake dataset that should have no true DE.
-However, if we used the unadjusted P-values, we would identify **A LOT**
-of potentially interesting genes, that would infact be
-**false-positives**.
-
-This example highlights the short coming of hypothesis testing
-approaches, and demonstrates how important it is to correct for multiple
-hypothesis testing.
-
-------------------------------------------------------------------------
+-----------------------
 
 ### Other visualizations - MA plots
 
