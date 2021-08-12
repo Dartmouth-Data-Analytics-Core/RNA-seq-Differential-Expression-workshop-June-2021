@@ -7,7 +7,7 @@
 
 ### Introduction
 
-Simple linear models, or linear regression, is used pervasively in bioinformatics and genomics for statistical inference. Linear models are relatively simple, flexible, and interpretable, meaning they make excellent tools for statistical inference and scale well to thousands of observations, which is critical for common genomics datasets.
+Simple linear models, or linear regression, is used pervasively in bioinformatics and genomics for statistical inference. Linear models are relatively simple, flexible, and interpretable, meaning they make excellent tools for statistical inference and they scale well to thousands of observations, which is critical for common genomics datasets.
 
 Beyond differential expression analysis, many types of genomic data anlaysis rely on linear models:
 - ChIP-seq (differential binding)
@@ -28,12 +28,12 @@ In the lesson below, we will introduce the basic concepts of linear models and h
 
 In a standard linear model, we assume that some *response* variable (*Y*) can be represented as a linear combination of a set of *predictors* (*X*, independent variables). In building a linear model, we estimate a set of *coefficients* that explain how the *predictors* are related to the *response*. We can use these *coefficients* for statistical inference to better understand which predictors are associated with our response, or for applying the model to new data where we wish to predict the response variable using only a set of predictors.
 
-Before reviewing out the statistical notation for a simple linear model, it can be useful to first consider the main components:
+Before reviewing the statistical notation for a simple linear model, it can be useful to first consider the main components:
 `response = predictor(s) + error`
 
-- **The *response*** is the dependent variable we wish to model based on some set of predictors
+- **The *response*** is the dependent variable we wish to model based on some set of predictors (*Y*)
 
-- **The *predictor(s)*** is the independent variable, or variables, that we wish to model as a linear combination of the response (this is usually what we are interested in for statistical inference and hypothesis testing)
+- **The *predictor(s)*** is the independent variable, or variables, that we wish to model as a linear combination of the response (this is usually what we are interested in for statistical inference and hypothesis testing) (*X*)
 
 - **The *error*** component represents the information not explained by the model, and exists since we know that no set of predictors will perfectly explain the response variable. These are often referred to as the *residuals* of the model.
 
@@ -171,14 +171,14 @@ segments(dat2$hba1c, dat2$gene_exp, dat2$hba1c, pre, col="cornflowerblue")
 <img src="../figures/lm_example-2.png" height="500" width="550"/>
 
 
-The flatter slope of the regression line, and larger values of the residuals, suggests there is no useful relationship between Hba1c levels and expression of gene Y, which is supported by the large *P*-value returned by the model.
+The flatter slope of the regression line and larger values of the residuals, suggests there is no useful relationship between Hba1c levels and expression of gene Y, which is supported by the large *P*-value returned by the model.
 
 
 ------
 
 ### Part 4 - Simple Linear modeling with categorical variables
 
-In genomics, we commonly have categorial predictor variables, in contrast to the continuous variable (Hba1c) from our example above. Example of categorial variable include:
+In genomics, we commonly have categorial predictor variables, in contrast to the continuous variable (Hba1c) from our example above. Examples of categorial variables include:
 - Wild-type vs knockout
 - Vehicle vs treatment
 - Control vs diseased
@@ -198,7 +198,7 @@ table(dat3$subject_group)
 boxplot(dat3$exp_geneX ~ dat3$subject_group ,
      ylab = "Expression (Gene X)",
      xlab = "Subject group",
-     main = "Gene X exp. vs Hba1c",
+     main = "Gene X exp. in subject groups",
      col = c("indianred", "cornflowerblue"), pch = 16, las = 1)
 
 
@@ -240,7 +240,7 @@ While standard linear models are very useful, there are situations where their u
 - when values of Y are restricted (e.g. must be positive integers or binary values)
 - when the variance of Y depends on the mean
 
-One example from bioinformatics is RNA-seq gene expression data, where expression is measured in terms of read counts, whose values are restricted to being positive integers, and follow a distribution different from the normal distribution. Bulk RNA-seq data generally follow exhibit a distribution referred to as the *negative-binomial*.
+One example from bioinformatics is RNA-seq gene expression data, where expression is measured in terms of read counts, whose values are restricted to being positive integers, and follow a distribution different from the normal distribution. Bulk RNA-seq data generally exhibit a distribution referred to as the *negative-binomial*.
 
 <p align="center">
 <img src="../figures/neg-binom.png" title="xxxx" alt="context"
