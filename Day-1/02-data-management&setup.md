@@ -7,6 +7,27 @@
 - Learn the principles behind the major normalization strategies in RNA-seq and when to apply them
 - Learn how to perform these normalization strategies
 
+----------
+
+### Downloading the workshop repository
+
+We will be running most of the analysis for the workshop on your local machines. To have access to the relevant datasets and other workshop materials, we need to download (or clone) the repository (repo) from [GitHub](https://github.com/Dartmouth-Data-Analytics-Core/RNA-seq-Differential-Expression-workshop-June-2021).
+
+If you are comfortable using the Terminal or a Terminal emulator on your computer, you can copy and paste the code below to clone the repository onto your device.
+
+```bash
+git clone https://github.com/Dartmouth-Data-Analytics-Core/RNA-seq-Differential-Expression-workshop-June-2021
+```
+
+Alterantively, you can directly download the repository by going directly to the [workshop GitHub repo](https://github.com/Dartmouth-Data-Analytics-Core/RNA-seq-Differential-Expression-workshop-June-2021) from the dropdown menu and selecting `Download ZIP` as shown in the figure below.
+
+
+<p align="center">
+<img src="../figures/download-zip.png" alt="overview"
+	title="" width="100%" height="25%" />
+</p>
+
+
 ------------------------------
 
 ### Importing count data into R  
