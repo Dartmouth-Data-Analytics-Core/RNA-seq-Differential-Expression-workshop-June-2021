@@ -111,6 +111,11 @@ if (!any(rownames(installed.packages()) == "kableExtra")){
 }
 library(kableExtra)
 
+if (!any(rownames(installed.packages()) == "readr")){
+      install.packages("readr")
+}
+library(readr)
+
 if (!any(rownames(installed.packages()) == "rlang")){
   if (!requireNamespace("BiocManager", quietly = TRUE))
       install.packages("BiocManager")
