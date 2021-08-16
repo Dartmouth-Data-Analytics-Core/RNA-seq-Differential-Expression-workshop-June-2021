@@ -10,9 +10,9 @@ For this workshop we will be using a published dataset as part of a study to det
 
 The cartoon below provides an overview of the experimental design:
 
-<p align="center">
+<p align="left">
 <img src="figures/experiment.png" alt="overview"
-	title="" width="80%" height="80%" />
+	title="" width="65%" height="65%" />
 </p>
 
 The raw data was downloaded from the [Sequence Read Archive, SRA ](https://www.ncbi.nlm.nih.gov/sra?) a large NCBI database of high-throughput sequencing (HTS) data, and processed to generate a gene expression matrix of raw counts. These data are avilable under SRA accession [SRP033351](https://www.ncbi.nlm.nih.gov/sra?term=SRP033351).
@@ -131,6 +131,48 @@ if (!any(rownames(installed.packages()) == "apeglm")){
   BiocManager::install("apeglm")
 }
 library(apeglm)
+
+if (!any(rownames(installed.packages()) == "dplyr")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("dplyr")
+}
+library(dplyr)
+
+if (!any(rownames(installed.packages()) == "ggplot2")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("ggplot2")
+}
+library(ggplot2)
+
+if (!any(rownames(installed.packages()) == "pheatmap")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("pheatmap")
+}
+library(pheatmap)
+
+if (!any(rownames(installed.packages()) == "gplots")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("gplots")
+}
+library(gplots)
+
+if (!any(rownames(installed.packages()) == "RColorBrewer")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("RColorBrewer")
+}
+library(RColorBrewer)
+
+if (!any(rownames(installed.packages()) == "circlize")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("circlize")
+}
+library(circlize)
 
 sessionInfo()
 ```
