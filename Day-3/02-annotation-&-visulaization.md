@@ -1,9 +1,3 @@
-To do:
-
-- reduce overall text where possible
-- Center images
-
-
 # Results annotation & visualization
 
 ### Visualization of Differential Expression
@@ -100,8 +94,10 @@ The fold-change value of genes with non-significant fold changes is not meaningf
     abline(h=-log10(0.05), lty = 2, col = "black") # nominal P-value
 ```
 
+<p align="center">
+  <img src="../figures/volcano1.png" />
+</p>
 
-![](../figures/volcano1.png)
 
 Here we can clearly see that there are some genes above our significance threshold in both the up and downregulation directions (negative and positive fold changes), that also have absolute log2 fold change values of at least 2 or more. Of particular interest, there seem to be a few genes with very large fold change values & -log10 P-values, making them especially interesting as their effect size is large AND our confidence in this fold change is good.
 
@@ -172,8 +168,10 @@ It is a little hard to make specific inferences from this plot at the individual
     print(p)
 
 ```
+<p align="center">
+  <img src="../figures/volcano2.png" />
+</p>
 
-![](../figures/volcano2.png)
 
 This is nice, but some labels for potentially interesting genes would be useful. Lets add some using the **ggrepel** package.
 
@@ -202,7 +200,10 @@ This is nice, but some labels for potentially interesting genes would be useful.
     print(p2)
 ```
 
-![](../figures/volcano3.png)
+<p align="center">
+  <img src="../figures/volcano3.png" />
+</p>
+
 
 This looks a lot better, and gives us a lot more information than the first, very basic plot we generated.
 
@@ -228,7 +229,11 @@ The MA-plot allows us to inspect the **full range of expression values over whic
 ```r
     plotMA(res_ord, ylim=c(-6,6), main = "Raw Log2 Fold change")
 ```
-![](../figures/raw_MAplot.png)
+
+<p align="center">
+  <img src="../figures/raw_MAplot.png" />
+</p>
+
 
 The **log2 fold-change** plotted above is the raw LFC value estimated by the negative binomial GLM that we used in modeling. However, as we discussed above, the individual estimates of variance or dispersion for a single gene are often unreliable, and this holds true `log2 fold change` also.
 
@@ -263,7 +268,10 @@ plotMA(res_ord, ylim=c(-6,6), main = "Raw Log2 Fold change")
 ```r
 plotMA(res_shrink, ylim=c(-6,6), main = "Shrunken Log2 Fold change")
 ```
-![](../figures/MAplots.png)
+<p align="center">
+  <img src="../figures/MAplots.png" />
+</p>
+
 
 We can see that **significantly DE genes are detected across the full range of expression values** (x-axis), which is a good sign that our differential expression modeling has worked well. We can also see that we have a handful of genes with larger expression values (&gt; LFC 2) which potentially represent the most important individual genes, while the majority of our DEGs have a LFC &lt; 1.5 (ish).
 
@@ -320,5 +328,8 @@ A final visualization that is useful to generate is a heatmap based on unsupervi
     # plot the heatmap
     draw(ht1, row_title = "Genes", column_title = "Hierachical clustering of DEGs (padj<0.05)")
 ```
+<p align="center">
+  <img src="../figures/heatmap.png" />
+</p>
 
-![](../figures/heatmap.png)
+
