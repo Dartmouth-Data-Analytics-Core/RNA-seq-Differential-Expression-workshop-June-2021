@@ -1,6 +1,7 @@
 To do:
 - add learning objectives
 - reduce overall text where possible
+- Center images
 
 
 # Results annotation & visualization
