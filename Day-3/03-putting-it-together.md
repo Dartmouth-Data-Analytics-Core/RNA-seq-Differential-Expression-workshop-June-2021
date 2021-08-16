@@ -9,7 +9,8 @@ Load required R-packages:
 ```r
 library(DESeq2)
 ```
-ß
+
+
 Load the DESeq2 dataset we already generated:
 ```r
 dds <- readRDS("DESeq2.rdata")
@@ -84,4 +85,4 @@ res_shrink <- lfcShrink(dds,
                         type="apeglm")
 ```
 
-While additional setups exist, for example exploratory data analysis (e.g. PCA, hie) or visualization of DE results (volcano plots, MA plots) the core steps of the DE analysis can be run with just these few functions detailed above (meaning it is important to understand what they are doing under the hood).
+While additional setups exist, for example exploratory data analysis (e.g. PCA, hierarchical clustering) or visualization of DE results (volcano plots, MA plots) the core steps of the DE analysis can be run with just these few functions detailed above (meaning it is important to understand what they are doing under the hood).
