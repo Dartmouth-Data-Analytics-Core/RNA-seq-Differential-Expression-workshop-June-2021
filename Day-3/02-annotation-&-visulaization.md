@@ -1,11 +1,17 @@
 To do:
-- add learning objectives
+
 - reduce overall text where possible
 - Center images
 
 
 # Results annotation & visualization
 
+### Visualization of Differential Expression
+
+- Learn how to add annotations to differential expression results
+- Create graphics to better understand the dynamics of differential expression in the comparison of interest
+
+### Gene annotation
 
 ```r
 library(vsn)
@@ -20,9 +26,10 @@ library(EnhancedVolcano)
 library(apeglm)
 library(xtable)
 library(kableExtra)
+library(ggrepel)
 ```
 
-We want to also add the annotation data for each gene (symbol, genome coordinates, etc.) to the results. Since we used Ensembl version 97 to annotate these data, we need to use the Ensembl 97 annotation data to annotate these results. We can obtain this for our species of interest in a flat file format using the [BioMart on the Ensembl website](http://uswest.ensembl.org/biomart/martview/b0399bb192186dea3aedf87d82a4580c).
+To improve the quality of our reporting we want to add the annotation data for each gene (symbol, genome coordinates, etc.) to the results. Since we used Ensembl version 97 to annotate these data, we need to use the Ensembl 97 annotation data to annotate these results. We can obtain this for our species of interest in a flat file format using the [BioMart on the Ensembl website](http://uswest.ensembl.org/biomart/martview/b0399bb192186dea3aedf87d82a4580c).
 
 ```r
     # read in the flat file we downloaded and have a look at it
@@ -35,7 +42,7 @@ We want to also add the annotation data for each gene (symbol, genome coordinate
     head(anno)
 ```
 
-Lets have a look at the Chromosome distribution of features
+Lets have a look at the distribution of features on each Chromosome
 
 ```r
     tab1 <- table(anno$Chromosome.scaffold.name)
@@ -96,9 +103,9 @@ The fold-change value of genes with non-significant fold changes is not meaningf
 
 ![](../figures/volcano1.png)
 
-Here we can clearly see that there are quite a few genes above our significance threshold in both the up and downregulation directions (negative and positive fold changes), that also have absolute log2 fold change values of at least 2 or more. Of particular interest, there seem to be a few genes with very large fold change values & -log10 P-values, making them especially interesting as their effect size is large AND our confidence in this fold change is good.
+Here we can clearly see that there are some genes above our significance threshold in both the up and downregulation directions (negative and positive fold changes), that also have absolute log2 fold change values of at least 2 or more. Of particular interest, there seem to be a few genes with very large fold change values & -log10 P-values, making them especially interesting as their effect size is large AND our confidence in this fold change is good.
 
-It is a little hard to make specific inferences from this plot at the individual gene level, so some labels for interesting data points ( and some colors) would definitely improve this volcano plot, and make it more informative. We will use the **ggpolot2** R package to do this, and we will color each point based on a combination of fold change and P-value, as these determine which genes are of most interest to us.
+It is a little hard to make specific inferences from this plot at the individual gene level, so some labels for interesting data points (and some colors) would definitely improve this volcano plot, and make it more informative. We will use the **ggpolot2** R package to do this, and we will color each point based on a combination of fold change and P-value, as these determine which genes are of most interest to us.
 
 ```r
     # save a dataframe from the results() output
@@ -114,32 +121,41 @@ It is a little hard to make specific inferences from this plot at the individual
     # loop through our dataframe and add values to the color column based on magnitude of alpha and LFCs
     res_tmp$cols <- NA
     for(i in 1:nrow(res_tmp)){
-        if(is.na(res_tmp$pvalue[i])){
-          res_tmp$cols[i] <- NA
-        }
-        else if(res_tmp$pvalue[i]<=alpha & res_tmp$log2FoldChange[i] > fc_cutoff){
-          res_tmp$cols[i] <- "indianred"
-        }
-        else if(res_tmp$pvalue[i]<=alpha & res_tmp$log2FoldChange[i] < -fc_cutoff){
-          res_tmp$cols[i] <- "indianred"
-        }
-        else if(res_tmp$pvalue[i]<=alpha & res_tmp$log2FoldChange[i]>-fc_cutoff & res_tmp$log2FoldChange[i]<fc_cutoff){
-          res_tmp$cols[i] <- "cornflowerblue"
-        }
-        else if(res_tmp$pvalue[i]>alpha & res_tmp$log2FoldChange[i] > fc_cutoff){
-          res_tmp$cols[i] <- "gray47"
-        }
-        else if(res_tmp$pvalue[i]>alpha & res_tmp$log2FoldChange[i] < -fc_cutoff){
-          res_tmp$cols[i] <- "gray47"
-        }
-        else if(res_tmp$pvalue[i]>alpha & res_tmp$log2FoldChange[i] < fc_cutoff){
-          res_tmp$cols[i] <- "gray10"
-        }
+    # if pvalue is NA don't assign a color - no plotting
+    if(is.na(res_tmp$pvalue[i])){
+        res_tmp$cols[i] <- NA
     }
+    
+    # if pvalue is < alpha AND LFC is > FC cutoff color red
+    else if(res_tmp$pvalue[i]<=alpha & res_tmp$log2FoldChange[i] > fc_cutoff){
+        res_tmp$cols[i] <- "indianred"
+    }
+    
+    # if pvalue is < alpha AND LFC is < -FC cutoff color red
+    else if(res_tmp$pvalue[i]<=alpha & res_tmp$log2FoldChange[i] < -fc_cutoff){
+        res_tmp$cols[i] <- "indianred"
+    }
+    # if pvalue is < alpha AND LFC is not within cut off value color blue
+    else if(res_tmp$pvalue[i]<=alpha & res_tmp$log2FoldChange[i]>-fc_cutoff & res_tmp$log2FoldChange[i]<fc_cutoff){
+        res_tmp$cols[i] <- "cornflowerblue"
+    }
+    # if pvalue is > alpha AND LFC is > cut off value color gray
+    else if(res_tmp$pvalue[i]>alpha & res_tmp$log2FoldChange[i] > fc_cutoff){
+        res_tmp$cols[i] <- "gray47"
+    }
+    # if pvalue is > alpha and LFC is < -cut off value color gray
+    else if(res_tmp$pvalue[i]>alpha & res_tmp$log2FoldChange[i] < -fc_cutoff){
+        res_tmp$cols[i] <- "gray47"
+    }
+    # if pvalue is > alpha and LFC is not within cutoff values color light gray 
+    else if(res_tmp$pvalue[i]>alpha & res_tmp$log2FoldChange[i] < fc_cutoff){
+        res_tmp$cols[i] <- "gray10"
+    }
+  }
 
     res_tmp$ENSG <- rownames(res_tmp)
 
-    # generate the splot
+    # generate the plot
     p = ggplot(res_tmp, aes(log2FoldChange, -log10(pvalue))) +
         geom_point(aes(col=col), alpha = 0.5, size =2.5, colour = res_tmp$cols, fill = res_tmp$cols)  +
         xlab("Log2 fold change") + ylab("-log10 Q-value") +
@@ -148,6 +164,9 @@ It is a little hard to make specific inferences from this plot at the individual
         geom_hline(yintercept = -log10(alpha), color = "black", linetype = "dashed", size = 0.4) +
         theme(legend.key = element_blank()) +
         ggtitle("Control vs Dex")
+      # add vertical fold change lines
+      geom_vline(xintercept = fc_cutoff, colour = "black", linetype="dotted") +
+      geom_vline(xintercept = -fc_cutoff, colour = "black", linetype="dotted")
 
     # print the plot
     print(p)
@@ -178,9 +197,6 @@ This is nice, but some labels for potentially interesting genes would be useful.
                          label.size = 0.1,
                          segment.size = 0.3,
                          segment.color = 'grey50', size = 3) +
-      # add vertical fold change lines
-      geom_vline(xintercept = fc_cutoff, colour = "black", linetype="dotted") +
-      geom_vline(xintercept = -fc_cutoff, colour = "black", linetype="dotted")
 
     # print the plot
     print(p2)
@@ -206,8 +222,6 @@ Food for thought: detecting truly differentially expressed genes is dependent on
 -----------------------
 
 ### Other visualizations - MA plots
-
-MA plots are also useful ways to visualize results from a DE analysis of RNA-seq data. These involve plotting the log2 fold-change (the so called M-value, representing the *M* in *MA-plot*) against the average expression level of a gene (the *A* in *MA-plot*).
 
 The MA-plot allows us to inspect the **full range of expression values over which we detected significant DEGs, and what the magnitude of these fold-changes is**. In a typical experiment, we expect to see DEGs across most of the range of expression values. To help identify genes that were significantly DE, any gene with an adjusted P-value of &lt; 0.05 (or whatever threshold is set) is colored in red.
 
@@ -253,7 +267,7 @@ plotMA(res_shrink, ylim=c(-6,6), main = "Shrunken Log2 Fold change")
 
 We can see that **significantly DE genes are detected across the full range of expression values** (x-axis), which is a good sign that our differential expression modeling has worked well. We can also see that we have a handful of genes with larger expression values (&gt; LFC 2) which potentially represent the most important individual genes, while the majority of our DEGs have a LFC &lt; 1.5 (ish).
 
-Comparing to the raw LFCs, we can also see that the **majority of genes with lower expression values have have their LFCs shrunk toward zero**. This is important as genes with low counts may simply end up with a large LFC since this is easy to do at small count values, but these are unlikely to be accurate fold-changes, so we don’t want to prioritize their importance by giving them a large LFC.
+Comparing to the raw LFCs, we can also see that the **majority of genes with lower expression values have have their LFCs shrunk toward zero**. This is important as genes with low counts may end up with a large LFC since this is easy to do at small count values, but these are unlikely to be accurate fold-changes, so we don’t want to prioritize their importance by giving them a large LFC.
 
 It’s always good to look at the shrunken estimates, to confirm that you don’t have a lot of DEGs at very small count values. If you do, you may want to look at the expression levels for those genes to investigate these findings in more detail.
 
@@ -265,10 +279,13 @@ It’s always good to look at the shrunken estimates, to confirm that you don’
 
 #### Hierachical clustering on the DEGs
 
-A final visualization that is useful to generate is a heatmap based on unsupervised hierachical clustering of the DEGs identified. We can do this by limiting the matrix of rlog values to only those for the top XX DEGs, and then performing the clustering specifically on these data.
+A final visualization that is useful to generate is a heatmap based on unsupervised hierachical clustering of the DEGs identified. We can do this by limiting the matrix of rlog values to only those for the top 100 DEGs, and then performing the clustering specifically on these data.
 
 ```r
+    # take the regularized log
     rld <- rlog(dds, blind = FALSE)
+    
+    #isolate samples from groups of interest 
     ind_to_keep <- c(which(colData(rld)$group=="untreated"), which(colData(rld)$group=="Dex"))
 
     # set up gene expression matrix
@@ -280,8 +297,7 @@ A final visualization that is useful to generate is a heatmap based on unsupervi
     # set up colors for heatmap
     col = colorRamp2(c(-3, 0, 3), c("blue", "white", "red"))
     cols1 <- brewer.pal(11, "Paired")
-    cols2 <- brewer.pal(9, "Greens")
-
+   
     # subset coldata for samples in untx and ex groups
     colData_sub <- colData(dds)[ind_to_keep, ]
 
