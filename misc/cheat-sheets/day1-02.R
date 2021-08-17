@@ -61,4 +61,4 @@ head(colData(dds))
 # specific slots can also be accessed using the '@'
 dds@colData
 
-saveRDS(dds, file = "DESeq2.rdata")
+saveRDS(dds, file = "DESeq2.rds")

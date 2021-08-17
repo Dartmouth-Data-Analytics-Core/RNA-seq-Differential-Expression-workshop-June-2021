@@ -8,7 +8,6 @@ library(RColorBrewer)
 library(ComplexHeatmap)
 library(readr)
 library(circlize)
-library(EnhancedVolcano)
 library(apeglm)
 library(ggplot2)
 
@@ -90,7 +89,7 @@ for(i in 1:nrow(res_tmp)){
   else if(res_tmp$pvalue[i]>alpha & res_tmp$log2FoldChange[i] < -fc_cutoff){
     res_tmp$cols[i] <- "gray47"
   }
-  # if pvalue is > alpha and LFC is not within cutoff values color light gray 
+  # if pvalue is > alpha and LFC is not within cutoff values color light gray
   else if(res_tmp$pvalue[i]>alpha & res_tmp$log2FoldChange[i] < fc_cutoff){
     res_tmp$cols[i] <- "gray10"
   }
@@ -195,7 +194,8 @@ ha = columnAnnotation(x = anno_text(colData_sub$SRR,
 ht1 = Heatmap(mat_scaled, name = "Expression", col = col,
               top_annotation = c(ha1),
               bottom_annotation = c(ha),
-              show_row_names = FALSE)
+              show_row_names = FALSE,
+              show_column_names = FALSE)
 
 # plot the heatmap
 par(mfrow=c(1,1))

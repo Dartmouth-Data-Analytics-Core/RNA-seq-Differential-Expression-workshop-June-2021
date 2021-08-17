@@ -19,14 +19,14 @@ Load the DESeq2 dataset we already generated:
 setwd('~/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/')
 
 # load DESeq dataset
-dds <- readRDS("DESeq2.rdata")
+dds <- readRDS("DESeq2.rds")
 ```
 
 ### Introduction
 
 Our exploratory data analysis indicated that Control and Dexamethasone treated samples cluster together respectively, suggesting consistent gene expression profiles between the replicates within conditions. In contrast, Alb and co-treated samples did not cluster by treatment, suggesting less consistency between replicates within conditions.
 
-Based on these observations, a DE analysis of Control vs Dex is likely to have the most statistical power, therefore we will focus on this comparison in the following analysis. The image below highlights the main steps that will be involved in the DE analysis, and the functions that perform these steps in DESeq2.
+Based on these observations, a DE analysis of Control vs Dex is likely to have the most statistical power, therefore we will focus on this comparison in the following analysis. The image below highlights the main steps that will be involved in the DE analysis, and the functions that perform these steps in `DESeq2`.
 
 <p align="center">
 <img src="../figures/overview.png" alt="overview"

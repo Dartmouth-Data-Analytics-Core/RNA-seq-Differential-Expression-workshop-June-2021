@@ -1,9 +1,9 @@
-## Day3-01 Differential expression analysis in R 
+## Day3-01 Differential expression analysis in R
 
 library(DESeq2)
 setwd('~/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/')
 
-dds <- readRDS("DESeq2.rdata")
+dds <- readRDS("DESeq2.rds")
 
 # run the DEseq2 analysis
 dds <- DESeq(dds)
@@ -97,7 +97,7 @@ res <- results(dds,
 # how many significant DEGs
 sum(res$padj < 0.05, na.rm=TRUE)
 
-# count na values 
+# count na values
 table(is.na(res$padj))
 
 #threshold 1
@@ -127,4 +127,3 @@ write.csv(as.data.frame(res_ord), file = "DE_results.csv")
 
 # save RDS object
 saveRDS(dds, file = "DESeq2.rds")
-

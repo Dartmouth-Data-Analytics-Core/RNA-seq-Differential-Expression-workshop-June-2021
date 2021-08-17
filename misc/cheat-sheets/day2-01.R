@@ -3,7 +3,7 @@
 setwd('~/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/')
 
 # read in the RDS object
-dds <- readRDS("DESeq2.rdata")
+dds <- readRDS("DESeq2.rds")
 
 library(ggplot2)
 library(DESeq2)
@@ -255,4 +255,3 @@ ht2 = Heatmap(mat1, name = "Expression", col = col,
 
 # plot the heatmap
 draw(ht2, row_title = "Genes", column_title = "Top 500 most variable genes")
-

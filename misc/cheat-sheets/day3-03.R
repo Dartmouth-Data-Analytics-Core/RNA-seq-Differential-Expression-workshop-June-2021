@@ -2,11 +2,8 @@
 
 library(DESeq2)
 
-# load the DESeq dataset we already created:
-dds <- readRDS("DESeq2.rdata")
-
 # Read in the count data:
-cts <- as.matrix(read.table("Day-2/all_counts.txt",
+cts <- as.matrix(read.table("data/all_counts.txt",
                             sep="\t",
                             header = TRUE,
                             row.names=1,
@@ -15,10 +12,14 @@ cts <- as.matrix(read.table("Day-2/all_counts.txt",
 # Read in the metadata:
 colData <- read.csv("data/sample_metadata.csv", row.names=1)
 
+# convert tx.group into factor class variable
+colData$tx.group <- factor(colData$tx.group, levels=c("untreated", "Dex", "Alb", "Alb_Dex"))
+
 # Construct a DESeq2 dataset from the raw counts, the metadata, and the desired design variable to be tested for differential expression.
 dds <- DESeqDataSetFromMatrix(countData = cts,
                               colData = colData,
-                              design = ~ group)
+                              design = ~ tx.group)
+
 # Apply the DESeq2 analysis pipeline:
 dds <- DESeq(dds)
 
@@ -30,7 +31,7 @@ plotDispEsts(dds)
 
 # extract results
 res <- results(dds,
-               name = "group_Dex_vs_untreated",
+               name = "tx.group_Dex_vs_untreated",
                alpha = 0.05,
                lfcThreshold = 0)
 
@@ -38,7 +39,7 @@ res <- results(dds,
 res_ord <- res[order(res$padj),]
 
 # add gene annotation to results
-anno <- read.delim("Day-2/GRCh38.p12_ensembl-97.txt",
+anno <- read.delim("data/GRCh38.p12_ensembl-97.txt",
                    stringsAsFactors = T,
                    header = T)
 anno <- anno[order(anno$Chromosome.scaffold.name),]
@@ -53,5 +54,3 @@ res_order_FDR_05 <- res_ord[res_ord$padj<0.05,]
 res_shrink <- lfcShrink(dds,
                         coef=paste0(resultsNames(dds)[which(resultsNames(dds)=="group_Dex_vs_untreated")]),
                         type="apeglm")
-
-

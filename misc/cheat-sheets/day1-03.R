@@ -1,7 +1,7 @@
 # Day1-03 Normalization
 
 # read in the RDS object
-dds <- readRDS("DESeq2.rdata")
+dds <- readRDS("DESeq2.rds")
 
 cts <- counts(dds, normalized=FALSE)
 
@@ -133,20 +133,19 @@ gene_plot <- function(ENSG, gene_symbol){
   # save the normalized counts in a dataframe
   cnts <- counts(dds, normalized=TRUE)
   colnames(cnts) <- colData(dds)$SRR
-  
+
   # extract the counts for specified ENSG ID and add sample group data
   df1 <- data.frame(log2(cnts[ENSG,]), colData(dds)$tx.group)
   colnames(df1) <- c(paste0("log2_gene"), "sample_group")
-  
+
   # use ggplot2 to make a plot of counts vs sample group
   p1<- ggplot(df1, aes(sample_group, log2_gene)) +
     geom_jitter(aes(color = sample_group)) +
     ggtitle(paste0(gene_symbol), " - Log2 Normalized counts")
-  
+
   # print the plot
   print(p1)
 }
 
 # now apply the function to print a plot for a specified gene
 gene_plot(ENSG = "ENSG00000120129", gene_symbol = "DUSP1")
-
