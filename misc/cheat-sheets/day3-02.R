@@ -10,8 +10,6 @@ library(readr)
 library(circlize)
 library(EnhancedVolcano)
 library(apeglm)
-library(xtable)
-library(kableExtra)
 library(ggplot2)
 
 
