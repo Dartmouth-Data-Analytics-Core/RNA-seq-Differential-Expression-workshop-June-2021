@@ -11,8 +11,6 @@ library(gplots)
 library(RColorBrewer)
 library(ComplexHeatmap)
 library(circlize)
-library(xtable)
-library(kableExtra)
 
 setwd('~/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/')
 
