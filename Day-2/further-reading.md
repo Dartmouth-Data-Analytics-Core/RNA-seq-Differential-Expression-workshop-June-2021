@@ -1,4 +1,5 @@
 ## Video links
+(can you tell we really like Stat Quest- the explanations are straight forward and pertain to genomic data specifically)
 
 - [Stat Quest video on PCA](https://www.youtube.com/watch?v=_UVHneBUBW0)
 - [Stat Quest video on clustering algorithms](https://www.youtube.com/watch?v=7xHsRkOdVwo&ab_channel=StatQuestwithJoshStarmer)
