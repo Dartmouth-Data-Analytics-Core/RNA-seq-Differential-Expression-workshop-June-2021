@@ -118,12 +118,12 @@ if (!any(rownames(installed.packages()) == "rlang")){
 }
 library(rlang)
 
-if (!any(rownames(installed.packages()) == "enhancedVolcano")){
+if (!any(rownames(installed.packages()) == "EnhancedVolcano")){
   if (!requireNamespace("BiocManager", quietly = TRUE))
       install.packages("BiocManager")
   BiocManager::install("enhancedVolcano")
 }
-library(enhancedVolcano)
+library(EnhancedVolcano)
 
 if (!any(rownames(installed.packages()) == "apeglm")){
   if (!requireNamespace("BiocManager", quietly = TRUE))
