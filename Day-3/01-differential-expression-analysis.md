@@ -331,7 +331,7 @@ Other methods to control for multiple hypothesis testing can be applied using th
 res <- results(dds,
                 name = "tx.group_Dex_vs_untreated",
                 alpha = 0.05,
-								pAdjustMethod = "bonferroni")
+		pAdjustMethod = "bonferroni")
 
 # how many significant DEGs
 sum(res$padj < 0.05, na.rm=TRUE)
