@@ -121,7 +121,7 @@ library(rlang)
 if (!any(rownames(installed.packages()) == "EnhancedVolcano")){
   if (!requireNamespace("BiocManager", quietly = TRUE))
       install.packages("BiocManager")
-  BiocManager::install("enhancedVolcano")
+  BiocManager::install("EnhancedVolcano")
 }
 library(EnhancedVolcano)
 
