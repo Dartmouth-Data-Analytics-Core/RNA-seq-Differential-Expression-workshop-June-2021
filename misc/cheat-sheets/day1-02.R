@@ -39,10 +39,10 @@ colData <- colData[order(colData$SRR),]
 # quick look
 head(colData)
 
-# now make this a factor as it will be the variable we will use define groups for the differential expression analysis
+colData$tx.group
+colData$tx.group <- factor(colData$tx.group, levels=c("untreated", "Dex", "Alb", "Alb_Dex"))
 colData$tx.group
 
-colData$tx.group <- factor(colData$tx.group, levels=c("untreated", "Dex", "Alb", "Alb_Dex"))
 
 dds <- DESeqDataSetFromMatrix(countData = cts,
                               colData = colData,
