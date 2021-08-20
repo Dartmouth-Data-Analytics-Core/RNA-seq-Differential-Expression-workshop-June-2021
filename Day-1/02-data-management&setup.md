@@ -124,23 +124,22 @@ head(colData)
 Lets have a look at our experimental design variable (drug treatment:)
 
 ```r
+colData$tx.group
+```
+
+It is important that we make this variable a (`factor`) class variable, with the reference group set as the variable we want to be considered baseline expression by having it first in the list. You can create an ordered factor variable from a character string in R using:
+
+```r
 # now make this a factor as it will be the variable we will use define groups for the differential expression analysis
+colData$tx.group <- factor(colData$tx.group, levels=c("untreated", "Dex", "Alb", "Alb_Dex"))
+
+# have a look at this variable
 colData$tx.group
 
 ##  [1] untreated Dex       Alb       Alb_Dex   untreated Dex       Alb      
 ##  [8] Alb_Dex   untreated Dex       Alb       Alb_Dex   untreated Dex      
 ## [15] Alb       Alb_Dex  
 ## Levels: Alb Alb_Dex Dex untreated
-```
-
-It is important that we make this variable a (`factor`) class variable,
-with the reference group set as the variable we want to be considered
-baseline expression. This has already been done for us, however if it
-had not, you can create an ordered factor variable from a character
-string in R using:
-
-```r
-colData$tx.group <- factor(colData$tx.group, levels=c("untreated", "Dex", "Alb", "Alb_Dex"))
 ```
 ------------------------------------------------------------------------
 
