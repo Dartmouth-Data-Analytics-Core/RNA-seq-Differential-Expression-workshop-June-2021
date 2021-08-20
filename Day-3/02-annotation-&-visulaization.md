@@ -133,8 +133,8 @@ text(7.5, -log10(0.05/nrow(res))+0.5, "Bonferonni")
 text(7.5, -log10(0.05)+0.5, "P-value < 0.05")
 ```
 
-<p align="center", width=75%, height=75%>
-  <img src="../figures/volcano1.png" />
+<p align="center">
+  <img src="../figures/volcano1.png" width=70% height=70%/>
 </p>
 
 
