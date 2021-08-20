@@ -56,7 +56,7 @@ hist(rnbinom(n = 10000, mu = 100, size = 1/0.1),
 
 
 ## plot disp est for dds
-
+par(mfrow=c(1,1))
 plotDispEsts(dds)
 
 ## check results of GLM - wald test
