@@ -127,8 +127,10 @@ plot(res$log2FoldChange, -log10(res$pvalue),
      ylab = "- log10 P-value", xlab = "log2 Fold change")
 
 # add horizontal lines to help guide interpretation
-abline(h=-log10(0.05/nrow(res)), lty = 2, col = "black") # Bonferonni
+abline(h=-log10(0.05/nrow(res)), lty = 1, col = "black") # Bonferonni
 abline(h=-log10(0.05), lty = 2, col = "black") # nominal P-value
+text(7.5, -log10(0.05/nrow(res))+0.5, "Bonferonni")
+text(7.5, -log10(0.05)+0.5, "P-value < 0.05")
 ```
 
 <p align="center">
