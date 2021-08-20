@@ -1,7 +1,3 @@
-# To DO:
-- confirm if this is part 4 or part 3, and rename file name, or title of lesson below
-
-
 # Part 4 - Data normalization in RNA-seq
 
 ### Learning objectives:
