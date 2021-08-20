@@ -113,6 +113,9 @@ To identify the most variable genes in the dataset, we can calculate the varianc
 # calculate gene expression level variance between samples
 var <- rev(rowVars(assay(rld))[order(rowVars(assay(rld)))])
 
+# reset plotting window to 1 row vs 1 columns
+par(mfrow=c(1,1))
+
 # plot variance for genes accross samples
 plot(var,
      las = 1,
