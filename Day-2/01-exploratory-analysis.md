@@ -330,7 +330,6 @@ mat1 <- assay(rld)[topVarGenes,]
 # set up colors for heatmap
 col = colorRamp2(c(0, 9, 18), c("blue", "white", "red"))
 cols1 <- brewer.pal(11, "Paired")
-cols2 <- brewer.pal(9, "Greens")
 
 # set up annotation bar for samples
 ha1 = HeatmapAnnotation(Group = colData(dds)$tx.group,
@@ -379,7 +378,6 @@ mat1 <- assay(rld)[topVarGenes, ind_to_keep]
 # set up colors for heatmap
 col = colorRamp2(c(0, 9, 18), c("blue", "white", "red"))
 cols1 <- brewer.pal(11, "Paired")
-cols2 <- brewer.pal(9, "Greens")
 
 # subset coldata for samples in untx and ex groups
 colData_sub <- colData(dds)[ind_to_keep, ]
@@ -424,12 +422,15 @@ pca_df$sample_ids[pca_df$PC2 > 10 & pca_df$tx.group=="Dex"]
 colData_sub$batch <- "Batch 1"
 colData_sub$batch[colData_sub$SRR=="SRR1039516"] <- "Batch 2"
 colData_sub$batch[colData_sub$SRR=="SRR1039517"] <- "Batch 2"
+							     
+# add a second color palate to annotate batch
+cols2 <- brewer.pal(3, "Greens")
 
 # set up annotation bar for samples
 ha1 = HeatmapAnnotation(group = c(as.character(colData_sub$tx.group)),
                         batch = c(as.character(colData_sub$batch)),
                         col = list(group = c("untreated" = cols1[1], "Dex" = cols1[2]),
-                        batch = c("Batch 1" = cols1[5], "Batch 2" = cols1[6])),
+                        batch = c("Batch 1" = cols2[2], "Batch 2" = cols2[3])),
                         show_legend = TRUE)
 
 # generate heatmap object
@@ -451,4 +452,3 @@ draw(ht2, row_title = "Genes", column_title = "Top 500 most variable genes")
 Based on our newly labeled plot it does seem that these 2 samples are
 outliers, supporting the presence of a potentially non-biological factor affecting gene expression in these data (such as a batch effect).
 
-#### Notes on scaling data prior to hierarchical clustering
