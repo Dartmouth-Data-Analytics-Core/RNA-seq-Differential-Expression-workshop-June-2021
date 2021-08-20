@@ -1,7 +1,3 @@
-TO DO:
-- add section at end on scaling
-
-
 # 01 - Exploratory data analysis
 
 ### Learning objectives:
@@ -98,6 +94,7 @@ against each other.
 par(mfrow=c(1,2))
 
 # plot standard log counts
+cts <- counts(dds, normalized=FALSE)
 plot(log2(cts[,1]+1), log2(cts[,2]+1), col = "cornflowerblue", xlab = "Sample 1", ylab = "Sample 2", main = "Log2 + 1")
 
 # plot rlog counts
