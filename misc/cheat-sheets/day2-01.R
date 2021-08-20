@@ -29,6 +29,7 @@ head(assay(rld))
 par(mfrow=c(1,2))
 
 # plot standard log counts
+cts <- counts(dds, normalized=FALSE)
 plot(log2(cts[,1]+1), log2(cts[,2]+1), col = "cornflowerblue", xlab = "Sample 1", ylab = "Sample 2", main = "Log2 + 1")
 
 # plot rlog counts
@@ -39,6 +40,7 @@ plot(assay(rld)[,1], assay(rld)[,2], col = "indianred", xlab = "Sample 1", ylab 
 # calculate gene expression level variance between samples
 var <- rev(rowVars(assay(rld))[order(rowVars(assay(rld)))])
 
+# reset plotting window to 1 row and 1 column
 par(mfrow=c(1,1))
 # plot variance for genes accross samples
 plot(var,
@@ -160,7 +162,6 @@ mat1 <- assay(rld)[topVarGenes,]
 # set up colors for heatmap
 col = colorRamp2(c(0, 9, 18), c("blue", "white", "red"))
 cols1 <- brewer.pal(11, "Paired")
-cols2 <- brewer.pal(9, "Greens")
 
 # set up annotation bar for samples
 ha1 = HeatmapAnnotation(Group = colData(dds)$tx.group,
@@ -201,7 +202,6 @@ mat1 <- assay(rld)[topVarGenes, ind_to_keep]
 # set up colors for heatmap
 col = colorRamp2(c(0, 9, 18), c("blue", "white", "red"))
 cols1 <- brewer.pal(11, "Paired")
-cols2 <- brewer.pal(9, "Greens")
 
 # subset coldata for samples in untx and ex groups
 colData_sub <- colData(dds)[ind_to_keep, ]
@@ -239,11 +239,14 @@ colData_sub$batch <- "Batch 1"
 colData_sub$batch[colData_sub$SRR=="SRR1039516"] <- "Batch 2"
 colData_sub$batch[colData_sub$SRR=="SRR1039517"] <- "Batch 2"
 
+# add a new color palate for batch
+cols2 <- brewer.pal(3, "Greens")
+
 # set up annotation bar for samples
 ha1 = HeatmapAnnotation(group = c(as.character(colData_sub$tx.group)),
                         batch = c(as.character(colData_sub$batch)),
                         col = list(group = c("untreated" = cols1[1], "Dex" = cols1[2]),
-                                   batch = c("Batch 1" = cols1[5], "Batch 2" = cols1[6])),
+                                   batch = c("Batch 1" = cols2[2], "Batch 2" = cols2[3])),
                         show_legend = TRUE)
 
 # generate heatmap object
