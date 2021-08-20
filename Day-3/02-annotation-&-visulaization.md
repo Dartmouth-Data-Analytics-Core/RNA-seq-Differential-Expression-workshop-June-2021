@@ -134,7 +134,7 @@ text(7.5, -log10(0.05)+0.5, "P-value < 0.05")
 ```
 
 <p align="center">
-  <img src="../figures/volcano1.png" width=70% height=70%/>
+  <img src="../figures/volcano1.png" width=50% height=50%/>
 </p>
 
 
@@ -208,7 +208,7 @@ print(p)
 
 ```
 <p align="center">
-  <img src="../figures/volcano2.1.png" width=70% height=70%/>
+  <img src="../figures/volcano2.png" width=50% height=50%/>
 </p>
 
 This is nice, but some labels for potentially interesting genes would be useful. Lets add some using the `ggrepel` package.
@@ -239,7 +239,7 @@ print(p2)
 ```
 
 <p align="center">
-  <img src="../figures/volcano3.1.png" height=70% width=70%/>
+  <img src="../figures/volcano3.png" height=50% width=50%/>
 </p>
 
 
@@ -263,7 +263,7 @@ plotMA(res_ord, ylim=c(-6,6), main = "Raw Log2 Fold change")
 ```
 
 <p align="center">
-  <img src="../figures/rawMAplot.png" height=70% width=70% />
+  <img src="../figures/rawMAplot.png" height=50% width=50% />
 </p>
 
 Statistically significant DE genes are detected across the full range of expression values (x-axis), which is a good indicator that our differential expression model has was appropriate and worked well.
@@ -310,7 +310,7 @@ plotMA(res_ord, ylim=c(-6,6), main = "Raw Log2 Fold change")
 plotMA(res_shrink, ylim=c(-6,6), main = "Shrunken Log2 Fold change")
 ```
 <p align="center">
-  <img src="../figures/MAplots.1.png" height=70% width=70% />
+  <img src="../figures/MAplots.1.png" height=50% width=50% />
 </p>
 
 Comparing to the raw LFCs, **majority of genes with lower expression values have had their LFCs shrunk toward zero**. Conceptually, genes with low counts can easily generate a large LFC since only a few extra counts represent a substantial proportional difference between two small numbers. Consequently, these fold-changes are unlikely to be accurate as they are based of few reads, so we don’t want to prioritize their importance by giving them a large LFC, and instead shrink them toward 0.
@@ -372,7 +372,7 @@ ht1 = Heatmap(mat_scaled, name = "Expression", col = col,
 draw(ht1, row_title = "Genes", column_title = "Hierachical clustering of DEGs (padj<0.05)")
 ```
 <p align="center">
-  <img src="../figures/heatmap.1.png" />
+  <img src="../figures/heatmap.1.png" height=70% width=70% />
 </p>
 
 The differentially expressed genes clearly differentiate the untreated samples from the Dex treated samples. Importantly, we can see how many genes are expressed at greater levels in the Dex treated samples than in the untreated, and vice versa.
