@@ -184,6 +184,9 @@ Before performing a DE analysis, it is therefore important to check the relation
 
 Plot the dispersion estimates for our dataset:
 ```r
+# set the plotting window to 1 rows and 1 column
+par(mfrow=c(1,1))
+
 plotDispEsts(dds)
 ```
 
