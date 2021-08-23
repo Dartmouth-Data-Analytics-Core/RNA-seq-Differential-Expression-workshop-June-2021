@@ -196,7 +196,7 @@ dev.off()
 	title="" width="80%" height="80%" />
 </p>
 
-DUSP1 expression is clearly variable across the samples, suggesting differential expression across sample groups may exist (treated vs untreated). This can be tested statistically in a formal differential expression analysis (next workshop!).
+DUSP1 expression is clearly variable across the samples, suggesting differential expression across sample groups may exist (treated vs untreated). This can be tested statistically in a formal differential expression analysis (more about this later).
 
 
 ### Reads/fragments per kilobase of exon per million mapped reads (RPKM/FPKM)
