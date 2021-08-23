@@ -38,7 +38,7 @@ tutorials](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/
 DESeq2 is a well organized package that applies robust algorithms to perform several aspects of RNA-seq data analysis. If you plan to use DESeq2 for your work, you should read both the tutorials made available on their Bioconductor page, and the original manuscript for DESeq2, in
 [Love *et al*, 2014](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8) to develop an understanding of the theory behind DESeq2 and the processes implemented by the package.
 
-Despite DESeq2’s extensive functionality, it may not be the best choice for all experimental designs, for example, analysis of time course experiments, or other designs where multiple data points are collected from the same subject/individual.
+> Despite DESeq2’s extensive functionality, it may not be the best choice for all experimental designs, for example, analysis of time course experiments, or other designs where multiple data points are collected from the same subject/individual.
 
 The figure below provides an outline of the major steps in a standard DE analysis with DESeq2, and highlights key functions used at each step.
 
