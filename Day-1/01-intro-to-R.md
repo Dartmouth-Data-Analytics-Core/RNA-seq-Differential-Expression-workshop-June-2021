@@ -3,11 +3,13 @@
 ------------------------------
 
 ### Learning objectives:
-- Learn XXXXXXXXXX
+- Learn the basic syntax and data types availabe in R.
+- Learn about the RStudio environment.
+- Learn to read and write files within R.
 
 ------------------------------
 
-R is a free, open source programming language and statistical software environment that is used extensively in bioinformatics. Beyond the basic functionality included in R's standard distribution, an enormous number of packages designed to extend R's functionality for specific applications an exist, representing one of R's core strengths.
+R is a free, open source programming language and statistical software environment, first released in 1993, that is used extensively in bioinformatics. Beyond the basic functionality included in R's standard distribution, an enormous number of packages designed to extend R's functionality for specific applications an exist, representing one of R's core strengths.
 
 R is also a very powerful way to create high quality graphics, using both functionality in base R as well as graphics specific packages, such as [ggplot2](https://ggplot2.tidyverse.org/). These packages provide a high level of user control, meaning almost all plotting features can be controlled. Importantly, numerous R packages provide functionality for generating bioinformatics specific visualizations.
 
@@ -22,12 +24,12 @@ R is generally considered a *functional programming language*. Without going int
 **Functions** are specific pieces of code that take a defined input, perform an operation or series of operations on the input, and return an output, again in a defined format.
 
 In R, the basic syntax of a function is as follows:
-`name.of.function(argument.1 = value, argument.2 = value, ...)`
+`name_of_function(argument1 = value, argument2 = value, ...)`
 
-For example, the `print()` function will print the argument(s) provided to it as input to the R console as outputs. In the below code chunk, the inputs 1,2,3 are being provided to the `print()` function as inputs via its first 3 arguments.
+For example, the `print()` function will print the argument(s) provided to it as input to the R console as outputs. In the below code chunk, the input "Hello" is being provided to the `print()` function as input to its first argument.
 
 ```r
-print(1, 2, 3)
+print("Hello")
 ```
 
 Manual/help pages for a specific function can be obtained using `?`. To bring up the manual page for the `print()` function:
@@ -67,30 +69,30 @@ We will be using RStudio throughout the workshop, although will point out how an
 ---
 ## Orienting yourself
 
-As with working on the terminal a good first step is to orient yourself, lets see where on your local computer and reset this location to where you want to be with the `getwd()` and `setwd()` commands.
+As with working on the terminal a good first step is to orient yourself, let's see where you are on your local computer and reset this location to where you want to be with the `getwd()` and `setwd()` functions.
 
 ```r
-# where are you on your local machine
+# Where are you on your local machine
 getwd()
 
-# set working directory to the data folder of Day-2 in the github repo you downloaded - notice that the path needs to be in double quotes
-setwd("your_path/Bioinformatics_workshop/Day-2/data/")
+# Set working directory to the data folder in the github repository you downloaded - notice that the path needs to be in double quotes
+setwd("your_path/RNA-seq-Differential-Expression-workshop-June-2021-master/data")
 ```
 
 ## Basic data structures in R
 
-Programming in R is achieved by assigning values to *objects*. Objects are specific data structures that take on a particular form defined by that objects *class*. The most fundamental and basic object class in R are *vectors*.
+Programming in R is achieved by assigning values to *objects*. Objects are specific data structures that take on a particular form defined by that object's *class*. The most fundamental and basic object class in R are *vectors*.
 
 ### Vectors
 
-Vectors can only hold one type of data (a property referred to as being *atomic*).In R, five basic object classes exist:  
-- numeric - real numbers (e.g. 1.342)
-- integer - whole numbers (e.g. 1.0)Â
+Vectors can only hold one type of data (a property referred to as being *atomic*). In R, five basic object classes exist:  
+- numeric - real numbers (e.g. 33.3334)
+- integer - whole numbers (e.g. 42)
 - character - strings of characters (e.g. letters, words, sentences)
-- logical - `TRUE` or `FALSE`
-- complex - numbers with 'imaginary' parts (not commonly used)
+- logical - `TRUE` or `FALSE` (commonly called 'Boolean' values elsewhere)
+- complex - numbers with real and imaginary parts.
 
-Vectors can be created using the `c()` function (standing for *combine*), which concatenates its arguments together into a single vector. c() can be used in conjucntion with the assignment operator `<-` which tells R you want to assign that vector to a specific value.
+Vectors can be created using the `c()` function (standing for *combine*), which concatenates its arguments together into a single vector. c() can be used in conjunction with the assignment operator `<-` which tells R you want to assign that vector to a specific variable.
 ```r
 # numeric
 x <- c(1.63, 2.25, 3.83, 4.99)
@@ -98,11 +100,14 @@ x <- c(1.63, 2.25, 3.83, 4.99)
 # integer
 x <- as.integer(c(1, 2, 3, 4))
 
-# characters
+# character
 x <- as.character(c("a", "b", "c", "d"))
 
 # logical
 x <- c(TRUE, FALSE, TRUE, TRUE)
+
+# mixed?
+x <- c(1, "a")
 ```
 
 Each object class has specific *attributes*, which we can extract using the appropriate accessor functions. For example, the class of an object is itself an attribute that can be obtained using the `class()` function:
@@ -140,7 +145,7 @@ as.integer(x)
 
 Elements within vectors can be subset or indexed based on their position in that vector. Individual elements can also be assigned names, which can also be used to perform indexing.
 ```r
-# define a chacter string
+# define a character string
 x <- c("a", "b", "c", "d")
 
 # get elements 1 and 3
@@ -253,7 +258,7 @@ x < 2 | x ==4
 # which elements are less than 2 AND equal to 4
 x < 2 & x == 4
 ```
-**Note:** When combining operators, operator precedence applies, such that operators with high precedence will be evaluated first. For example, in the above line, `x < 2` will be evaluated before `x == 4` as the `<` has greater precedence than `==`. You can explore operator precendence in R using the man page returned by `?Syntax`.
+**Note:** When combining operators, operator precedence applies, such that operators with high precedence will be evaluated first. For example, in the above line, `x < 2` will be evaluated before `x == 4` as the `<` has greater precedence than `==`. You can explore operator precedence in R using the man page returned by `?Syntax`.
 
 Relational and logical operators can be used to subset a vector based on the values returned by the operator, and the brackets, as we did above for specific elements.
 ```r
@@ -352,9 +357,9 @@ dim(mat)
 
 # specific elements can be obtained through subsetting
 ### row 1
-mat1[1,]
+mat[1,]
 ### column 2
-mat1[,2]
+mat[,2]
 ### element 2 of row 3
 mat[3,2]
 
@@ -366,8 +371,8 @@ class(mat[1,])
 Since matrices have dimensions, `names()` cannot be used as we did for vectors. Instead, `names()` is generalized into `rownames()` and `colnames()`.
 
 ```r
-rownames(mat1) <- c("gene_1", "gene_2", "gene_3")
-colnames(mat1) <- c("subject_1", "subject_2", "subject_3")
+rownames(mat) <- c("gene_1", "gene_2", "gene_3")
+colnames(mat) <- c("subject_1", "subject_2", "subject_3")
 ```
 
 Matrices are a very important object class for mathematical and statistical applications in R, so it is certainly worth exploring more complex matrix operations if you will be doing any more complex statistical analysis in R.
@@ -387,7 +392,7 @@ df <- data.frame(subject_id = c("s1", "s2", "s3", "s4"),
 str(df)
 ```
 
-Note that the default behavior of `data.frame()` in R version < 4.0 is to convert character strings to factors. If you want to prevent this behavior, you can set the `StringsAsFactors` argument as `FALSE`. In R versions > 4.0, the default behaviour is `StringsAsFactors==TRUE`.
+Note that the default behavior of `data.frame()` in R version < 4.0 is to convert character strings to factors. If you want to prevent this behavior, you can set the `StringsAsFactors` argument as `FALSE`. In R versions > 4.0, the default behavior is `StringsAsFactors==TRUE`.
 
 ```r
 df <- data.frame(subject_id = c("s1", "s2", "s3", "s4"),
@@ -464,7 +469,7 @@ Beyond the functions implemented in base R and packages that you install, R allo
 
 Defining your own functions can be useful when you want to perform a specific set of tasks repeatedly on some input(s) and return a defined output. Furthermore, once defined functions become part of your global environment and are therefore preserved for future use they minimize the need for repetitive code.
 
-Functions are created using using `function()` with the assignment operator `<-`. The arguments you use in the `function()` command define the variables that those arguments will be assigned to when you call the function. The last line of the function defines what output is returned.
+Functions are created using `function()` with the assignment operator `<-`. The arguments you use in the `function()` command define the variables that those arguments will be assigned to when you call the function. The last line of the function defines what output is returned.
 
 Let's define a basic function as an example.
 ```r
@@ -569,13 +574,13 @@ Importantly, visualization implemented in these packages form the basis for some
 
 ## Import and export tabular data
 
-Tabular data are often stored a text files where the individual fields containing data points are separated by punctuation points. Three functions exist in base R to facilitate reading in tabular data stored as text files.
+Tabular data are often stored as text files where the individual fields containing data points are separated by punctuation points. Three functions exist in base R to facilitate reading in tabular data stored as text files.
 
 - `read.table()` - general function for reading in tabular data with various delimiters
 - `read.csv()` - used to read in comma separated values files, where commas are the delimiter
 - `read.delim()` - used to read in files in which the delimiters are tabs
 
-Use `read.table()` to read in the *all_counts.txt*  that we used on day 1. Since `read.table()` is a general function for loading in tabular data, we need to specify the correct separator/delimiter value using the `sep` argument. Tab delimited data is specified using `\t` in the sep argument.
+Use `read.table()` to read in the *all_counts.txt*  that we used on day 1. Since `read.table()` is a general function for loading in tabular data, we need to specify the correct separator/delimiter value using the `sep` argument. Tab delimited data is specified using `\t` in the `sep` argument.
 ```r
 # using read.table
 counts <- read.table(file = "all_counts.txt",
@@ -587,7 +592,7 @@ counts <- read.table(file = "all_counts.txt",
 class(counts); dim(counts); str(counts)
 ```
 
-Now use `read.delim()`. An important difference between `read.delim()` and `read.table()` are the default setting for the *sep* and *header* arguments. By deault in `read.delim()`, *sep* is set to `\t` and the header argument is set to `TRUE`, so we do not need to explicity call those arguments.
+Now use `read.delim()`. An important difference between `read.delim()` and `read.table()` are the default setting for the *sep* and *header* arguments. By default in `read.delim()`, *sep* is set to `\t` and the header argument is set to `TRUE`, so we do not need to explicitly call those arguments.
 ```r
 # using read.delim
 counts <- read.table(file = "all_counts.txt", stringsAsFactors=FALSE)
@@ -604,7 +609,7 @@ When datasets get very large, these base R functions can be quite slow. Although
 
 The major functions in base R that exist for writing tabular data to file are `write.table()` and `write.csv()`. Similarly to the read functions, `write.table()` provides a more generalized solution to writing data that requires you to specify the separator value.
 
-In both functions, the first argyument specifies the object in your global environment that you wish to write to file. The second argument defines the absolute or relative path to the location you wish to save this file.
+In both functions, the first argument specifies the object in your global environment that you wish to write to file. The second argument defines the absolute or relative path to the location you wish to save this file.
 ```r
 # subset counts for first 5 columns and first 2000 genes
 counts_sub <- counts[1:2000, 1:5]
@@ -613,7 +618,7 @@ counts_sub <- counts[1:2000, 1:5]
 write.table(counts_sub, file = "all_counts_sub.txt", sep = "\t")
 ```
 
-In contrast, `read.csv()` does not require you to set the delimitor value, and by default writes data to comma separated value files (.csv).
+In contrast, `read.csv()` does not require you to set the delimiter value, and by default writes data to comma separated value files (.csv).
 ```r
 write.csv(counts_sub, file = "all_counts_sub.csv")
 ```
@@ -622,12 +627,15 @@ write.csv(counts_sub, file = "all_counts_sub.csv")
 
 It is possible to save R objects to a file that maintains all of their attributes so that they can be easily loaded back into a new R session. This functionality is achieved using the `save()` and `load()` functions.
 
-`save()` accepts the names of the R objects you wish to write to a file (which will have extension `.Rdata`) as the first arguments, and the file path where you wish to write this file under the *file* argument. For example:
+`save()` accepts the names of the R objects you wish to write to a file (which will have the extension `.rdata`) as the first arguments, and the file path where you wish to write this file under the *file* argument. For example:
 ```r
 # create some R objects
 x <- c(1.63, 2.25, 3.83, 4.99)
 y <- c(TRUE, FALSE, TRUE, TRUE)
 z <- c("a", "b", "c", "d")
+
+# check where we are
+getwd()
 
 # save all 3 objects to one file
 save(x, y, z, file = "my_r_objects.rdata")
@@ -638,7 +646,7 @@ These objects can then be loaded back into your global environment using the `lo
 load(file = "my_r_objects.rdata")
 ```
 
-Single R objects can be saved and restored in a similar way using the `saveRDS()` and `readRDS()` functions. Files saved using RDS must take on the `.RDS` extension.
+Single R objects can be saved and restored in a similar way using the `saveRDS()` and `readRDS()` functions. Files saved using RDS must take on the `.rds` extension.
 ```r
 # save a single object to a specific file path
 saveRDS(x, file = "my_r_object.rds")
