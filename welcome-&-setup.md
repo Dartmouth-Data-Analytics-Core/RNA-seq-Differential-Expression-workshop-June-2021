@@ -15,7 +15,7 @@ The cartoon below provides an overview of the experimental design:
 	title="" width="60%" height="60%" />
 </p>
 
-The raw data was downloaded from the [Sequence Read Archive, SRA ](https://www.ncbi.nlm.nih.gov/sra?) a large NCBI database of high-throughput sequencing (HTS) data, and processed to generate a gene expression matrix of raw counts. These data are avilable under SRA accession [SRP033351](https://www.ncbi.nlm.nih.gov/sra?term=SRP033351).
+The raw data was downloaded from the [Sequence Read Archive, SRA ](https://www.ncbi.nlm.nih.gov/sra?) a large NCBI database of high-throughput sequencing (HTS) data, and processed to generate a gene expression matrix of raw counts. These data are available under SRA accession [SRP033351](https://www.ncbi.nlm.nih.gov/sra?term=SRP033351).
 
 Normalized data are also available from the [Gene Expression Omnibus (GEO)](https://www.ncbi.nlm.nih.gov/geo/), another NCBI database, used to store processed HTS datasets, under accession [GSE52778](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE52778).
 
