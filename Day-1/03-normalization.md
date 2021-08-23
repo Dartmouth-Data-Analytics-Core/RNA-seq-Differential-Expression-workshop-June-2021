@@ -11,7 +11,7 @@ If you started a new R session, you must load in the `DESeq2` object we created 
 
 ```r
 # load in the R object
-dds <- readRDS("DESeq2.rdata")
+dds <- readRDS("DESeq2.rds")
 ```
 
 As we saw in the last lesson, the `counts()` function can be used to extract the matrix of raw read counts from the DESeq2 object:
@@ -100,7 +100,7 @@ Calculate CPM for our dataset:
 # look at the counts object
 head(cts)
 
-# write a function that will calculate TPM
+# write a function that will calculate CPM
 cpm <- function(counts) {
 	cpm <- c()
 	for(i in 1:length(counts)){
@@ -212,7 +212,7 @@ The difference between RPKM and FPKM is very simple: RPKM is used for single-end
 
 Since our dataset is paired-end and we counted the number of fragments in the quantification step, we are calculating FPKM. Calculate FPKM from our raw read counts:
 ```r
-# write a function that will calculate TPM
+# write a function that will calculate FPKM
 fpkm <- function(counts, lengths) {
 	rate <- counts / lengths
 	fpkm <- c()
@@ -303,7 +303,7 @@ dds <- estimateSizeFactors(dds)
 StatQuest provides an excellent summary of the steps performed by
 `estimateSizeFactors()` in order to calculate these size factors.
 
-Size factors are usually close to 1, and presence of outliers could suggest violation of assumptions required to use the median of ratios method. Is is therefore helpful to check the distribution of size factors in our dataset.
+Size factors are usually close to 1, and presence of outliers could suggest violation of assumptions required to use the median of ratios method. It is therefore helpful to check the distribution of size factors in our dataset.
 
 ```r
 # extract size factors
