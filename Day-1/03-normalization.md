@@ -112,7 +112,7 @@ cpm <- function(counts) {
 # apply function to the columns of raw counts data
 # we start at the third column because the first two columns have the ensemble IDs and gene names
 cts_cpm <- apply(cts[, 3:5], 2, cpm)
-## NOTE: we are calculating tpm for first 3 samples only to save time..
+## NOTE: we are calculating cpm for first 3 samples only to save time..
 # add gene info columns back in
 cts_cpm <- cbind(cts[, c(1,2)], cts_cpm)
 
