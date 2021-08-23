@@ -19,7 +19,7 @@ If you are comfortable using the Terminal or a Terminal emulator on your compute
 git clone https://github.com/Dartmouth-Data-Analytics-Core/RNA-seq-Differential-Expression-workshop-June-2021
 ```
 
-Alterantively, you can directly download the repository by going directly to the [workshop GitHub repo](https://github.com/Dartmouth-Data-Analytics-Core/RNA-seq-Differential-Expression-workshop-June-2021) from the dropdown menu and selecting `Download ZIP` as shown in the figure below.
+Alternatively, you can directly download the repository by going directly to the [workshop GitHub repo](https://github.com/Dartmouth-Data-Analytics-Core/RNA-seq-Differential-Expression-workshop-June-2021) from the dropdown menu and selecting `Download ZIP` as shown in the figure below.
 
 
 <p align="center">
@@ -32,7 +32,7 @@ Alterantively, you can directly download the repository by going directly to the
 
 ### Importing count data into R  
 
-Several R-packges exist that are designed for analysis of bulk RNA-seq data, including [*EdgeR*](https://www.bioconductor.org/packages/release/bioc/html/edgeR.html),[*limma-voom*](http://bioconductor.org/packages/release/bioc/html/limma.html), [*DESeq2*](https://bioconductor.org/packages/release/bioc/html/DESeq2.html). In this workshop, we will use DESeq2 to perform most analysis, including reading in the counts, normalization, and statistical modeling.
+Several R-packages exist that are designed for analysis of bulk RNA-seq data, including [*EdgeR*](https://www.bioconductor.org/packages/release/bioc/html/edgeR.html),[*limma-voom*](http://bioconductor.org/packages/release/bioc/html/limma.html), [*DESeq2*](https://bioconductor.org/packages/release/bioc/html/DESeq2.html). In this workshop, we will use DESeq2 to perform most analysis, including reading in the counts, normalization, and statistical modeling.
 
 > [Detailed
 tutorials](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html) for using DESeq2 can be found on its Bioconductor page.
@@ -42,7 +42,7 @@ DESeq2 is a well organized package that applies robust algorithms to perform sev
 
 Despite DESeq2’s extensive functionality, it may not be the best choice for all experimental designs, for example, analysis of time course experiments, or other designs where multiple data points are collected from the same subject/individual.
 
-The figure below provides an outline of the major setps in a standard DE analysis with DESeq2, and highlights key functions used at each step.
+The figure below provides an outline of the major steps in a standard DE analysis with DESeq2, and highlights key functions used at each step.
 
 ![](../figures/overview.png)
 
@@ -64,7 +64,7 @@ setwd('~/Documents/GitHub/RNA-seq-Differential-Expression-workshop-June-2021/')
 ### The dataset
 
 The dataset that we are using comes from [this
-paper](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0099625), generated as part of a study exanmining the effects anti-inflammatory effects of glucocorticoids on human airway smooth muscle cells.
+paper](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0099625), generated as part of a study examining the effects anti-inflammatory effects of glucocorticoids on human airway smooth muscle cells.
 
 Four cell lines were established from human donors and treated with one of the below:
 - Control (vehicle)
@@ -170,7 +170,7 @@ function by specifying a `SampleTable` that includes the path to the
 htseq-count files, however since we compiled the read counts into one
 file, we can just load the dataset directly.
 
-Before moving on, lets explore our DESeq2 class object a bit to get to familar with its contents.
+Before moving on, lets explore our DESeq2 class object a bit to get to familiar with its contents.
 
 ```r
 # have a quick look at the object
