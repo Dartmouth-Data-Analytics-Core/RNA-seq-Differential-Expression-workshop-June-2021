@@ -145,7 +145,7 @@ as.integer(x)
 
 Elements within vectors can be subset or indexed based on their position in that vector. Individual elements can also be assigned names, which can also be used to perform indexing.
 ```r
-# define a character string
+# define a character vector
 x <- c("a", "b", "c", "d")
 
 # get elements 1 and 3
@@ -180,7 +180,7 @@ class(x.na)
 
 We introduced two *operators* in the examples above, the assignment operator `<-` and the sequence operator `:`. Operators are essentially symbols that tell R how you would like to relate the *operands* on either side of the symbol. in R, operators can be broadly categorized into *assignment*, *arithmetic*, *relational*, and *logical*.
 
-The major assignment operators are `<-` and `=` which both tell R to assign a vector to a some value. It is generally safer to use `<-` (in my opinion).
+The assignment operators are `<-` and `=` which both tell R to assign a vector to a some value. It is best to stick to one within a single project.
 
 Below are the basic *arithmetic*, *relational*, and *logical* operators that are useful to know.
 
@@ -582,6 +582,9 @@ Tabular data are often stored as text files where the individual fields containi
 
 Use `read.table()` to read in the *all_counts.txt*  that we used on day 1. Since `read.table()` is a general function for loading in tabular data, we need to specify the correct separator/delimiter value using the `sep` argument. Tab delimited data is specified using `\t` in the `sep` argument.
 ```r
+# check where we are
+getwd()
+
 # using read.table
 counts <- read.table(file = "all_counts.txt",
                      sep = "\t", header = TRUE, stringsAsFactors = FALSE)
@@ -595,7 +598,7 @@ class(counts); dim(counts); str(counts)
 Now use `read.delim()`. An important difference between `read.delim()` and `read.table()` are the default setting for the *sep* and *header* arguments. By default in `read.delim()`, *sep* is set to `\t` and the header argument is set to `TRUE`, so we do not need to explicitly call those arguments.
 ```r
 # using read.delim
-counts <- read.table(file = "all_counts.txt", stringsAsFactors=FALSE)
+counts <- read.delim(file = "all_counts.txt", stringsAsFactors=FALSE)
 
 # check class, dimensions and structure
 class(counts); dim(counts); str(counts)
@@ -618,7 +621,7 @@ counts_sub <- counts[1:2000, 1:5]
 write.table(counts_sub, file = "all_counts_sub.txt", sep = "\t")
 ```
 
-In contrast, `read.csv()` does not require you to set the delimiter value, and by default writes data to comma separated value files (.csv).
+In contrast, `write.csv()` does not require you to set the delimiter value, and by default writes data to comma separated value files (.csv).
 ```r
 write.csv(counts_sub, file = "all_counts_sub.csv")
 ```
