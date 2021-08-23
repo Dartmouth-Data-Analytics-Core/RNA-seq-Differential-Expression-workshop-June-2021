@@ -2,10 +2,8 @@
 ------------------------------
 
 ### Learning objectives:
+- Understand the experimental design for dataset we will be using
 - Learn how to read raw count data from an RNA-seq experiment into R
-- Understand why read counts must be normalized in RNA-seq data
-- Learn the principles behind the major normalization strategies in RNA-seq and when to apply them
-- Learn how to perform these normalization strategies
 
 ----------
 
