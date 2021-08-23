@@ -90,14 +90,17 @@ cts <- cts[1:(nrow(cts)-5),]
 tail(cts)
 ```
 
-If you used an assay that captures fragments along the full length of RNA transcripts, and generated **transcript-level abundances** (rather than **gene-level counts**) using a method like *RSEM*, *Salmon*, or *kallisto*, you should load read counts into R using the `tximport()` function from the [tximport package](https://f1000research.com/articles/4-1521/v1).
+If you used an assay that captures fragments along the full length of RNA transcripts, and generated **transcript-level abundances** (rather than **gene-level counts**) you should load read counts into R using the `tximport()` function from the [tximport package](https://f1000research.com/articles/4-1521/v1). Methods that generate expression estimates at the transcript-level include:  
+- *RSEM* 
+- *Salmon*
+- *kallisto*,
+
 
 Even if you only plan to do a gene-level DE analysis, it has been shown that [transcript-level estimates can improve gene-level inferences](https://f1000research.com/articles/4-1521/v1). Therefore if you are able to estimate counts at the transcript-level for your data, it is beneficial to do so.
 
 Briefly, this method works by collapsing transcript-level estimates into gene-level estimates, while an offset matrix is calculated based on the average transcript length, that is used in the differential expression analysis to correct for biases that may be introduced by transcript-length differences between samples. You can read more about how to do this in the [documnetation for tximport](https://bioconductor.org/packages/release/bioc/vignettes/tximport/inst/doc/tximport.html).
 
-If you collected **3’-end data**, e.g. with the **Lexogen QuantSeq assay**, you should not do this correction for length, as there is no length bias in your data. Doing this correction would introduce bias into your data and likely distort your differential expression results. For 3’-end data, it is best to read in the raw count matrix directly
-using (`DESeqDataSetFromHTSeqCount`) or simply (`read.table()`).
+If you collected **3’-end data**, e.g. with the **Lexogen QuantSeq assay**, you should not do this correction for length, as there is no length bias in your data. Doing this correction would introduce bias into your data and likely distort your differential expression results. For 3’-end data, it is best to read in the raw count matrix directly using (`DESeqDataSetFromHTSeqCount`) or simply (`read.table()`).
 
 ------------------------------------------------------------------------
 
