@@ -193,7 +193,7 @@ dev.off()
 
 <p align="center">
 <img src="../figures/DUSP1_tpm.png" alt="d1"
-	title="" width="60%" height="60%" />
+	title="" width="40%" height="30%" />
 </p>
 
 DUSP1 expression is clearly variable across the samples, suggesting differential expression across sample groups may exist (treated vs untreated). This can be tested statistically in a formal differential expression analysis (more about this later).
@@ -361,7 +361,7 @@ gene_plot(ENSG = "ENSG00000120129", gene_symbol = "DUSP1")
 
 <p align="center">
 <img src="../figures/dusp1-counts-de.png" alt=""
-	title="" width="55%" height="65%" />
+	title="" width="40%" height="20%" />
 </p>
 
 DUSP1 expression is consistently higher in the DEX samples than the untreated, suggesting this gene is differentially expressed, validating prior knowledge and giving us confidence that our experiment worked and sample labels are all correct.
