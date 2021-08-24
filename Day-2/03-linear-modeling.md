@@ -237,24 +237,55 @@ This approach is referred to as **multiple regression**. If you will be doing an
 
 While standard linear models are very useful, there are situations where their use is not appropriate, for example:
 
-- when values of Y are restricted (e.g. must be positive integers or binary values)
-- when the variance of Y depends on the mean
+- when values of Y are restricted (e.g. must be positive integers or binary values, such as with count data from NGS experiments)
+- when the variance of Y depends on the mean (such as with RNA-seq data, see below..)
 
-One example from bioinformatics is RNA-seq gene expression data, where expression is measured in terms of read counts, whose values are restricted to being positive integers, and follow a distribution different from the normal distribution. Bulk RNA-seq data generally exhibit a distribution referred to as the *negative-binomial*.
+As we have discussed, RNA-seq is measured in terms of read counts, whose values are restricted to being positive integers. If we visualize the distribution of RNA-seq data, we will see that the counts follow a distribution different from the normal distribution.
+
+Plot the distribution of normalized read counts from a single sample:
+```r
+hist(counts(dds, normalized=FALSE)[,5],
+     breaks = 500, col="blue",
+     xlab="Raw expression counts",
+     ylab="Number of genes",
+     main = "Count distribution for sample X")
+```
 
 <p align="center">
-<img src="../figures/neg-binom.png" title="xxxx" alt="context"
+<img src="../figures/dist-1.png" title="xxxx" alt="context"
 	width="75%" height="75%" />
 </p>
 
-RNA-seq read counts are also referred to as *heteroscadistic*, meaning they have a *non-constant variance* at different values of the mean across samples.
+
+We can easily see that the counts do not follow a normal distribution: most genes have very low count values, with relatively few demonstrating higher expression levels.
+
+Based on this observation, the counts cannot be modeled appropriately using a standard linear model. In fact, bulk RNA-seq data generally exhibit a distribution referred to as the *negative-binomial*, therefore we must us a model that assumes this distribution when performing differential expression testing. **We will discuss this in more detail on Friday**.
+
+RNA-seq read counts are also referred to as **heteroscadistic**, meaning they have a *non-constant variance* at different values of the mean across samples. We can see this if we plot the variance in read counts across samples against the mean.
+
+```r
+# calculate mean and variance for group of replicates
+mean_counts <- apply(counts(dds, normalized=FALSE)[,1:3], 1, mean)
+variance_counts <- apply(counts(dds, normalized=FALSE)[,1:3], 1, var)
+
+# plot the mean variance trend
+plot(log10(mean_counts), log10(variance_counts),
+     ylim=c(0,9), xlim=c(0,9),
+     ylab = "log10 (mean counts)", xlab = "log10 (variance)",
+     main = "Mean-variance trend", las = 1)
+
+# add line for x=y
+abline(0,1,lwd=2,col="red")
+```
 
 <p align="center">
 <img src="../figures/heteroscad.png" title="xxxx" alt="context"
 	width="75%" height="75%" />
 </p>
 
-Linear models are therefore generally not suitable to model read count data, and we need a statistical model that can leverage distributions other than the normal. *Generalized linear models (GLM)* are a family of statistical models that can achieve this, and generalize standard linear regression in two ways:
+Linear models assume that variance around the mean is constant, therefore RNA-seq data clearly violate this assumption, further demonstrating that standard linear models cannot be used for RNA-seq data.
+
+Instead, we need a statistical model that can leverage distributions other than the normal. *Generalized linear models (GLM)* are a family of statistical models that can achieve this, and generalize standard linear regression in two ways:
 - use of probability distributions other than the normal distribution
 - the use of a *link-function* that links the expression values in the linear model to the experimental groups, in a way that these other distributions can be used.
 

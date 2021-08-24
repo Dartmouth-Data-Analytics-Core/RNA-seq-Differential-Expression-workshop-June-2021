@@ -68,6 +68,7 @@ hist(counts(dds, normalized=FALSE)[,5],
      ylab="Number of genes",
      main = "Count distribution for sample X")
 ```
+
 <p align="center">
 <img src="../figures/dist-1.png" alt="overview"
 	title="" width="80%" height="80%" />
