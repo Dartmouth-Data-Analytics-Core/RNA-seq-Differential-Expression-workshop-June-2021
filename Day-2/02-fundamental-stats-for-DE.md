@@ -39,7 +39,7 @@ To help understand this procedure for, some useful definitions:
 - **P-value** - probability of observing data equal to or more extreme than that observed due to chance
 
 
-When performing hypothesis testing, we assume our data come from a distribution with a known area. By calculating quantities from our data (e.g. mean, standard deviation, sample size) we can use this distribution to calculate the **test-statistic**. As defined above, this statistic compares our data to a known distribution and tells us how extreme our result is.
+When performing hypothesis testing, we assume our data come from a distribution with a known area. By calculating quantities from our data (e.g. mean, standard deviation, sample size) we can use this distribution to calculate the **test-statistic**. As defined above, this statistic compares our data to a known distribution and tells us how extreme our result is to the null distribution.
 
 Several types of test-statistics exist, and which one we use depends on the type of data we have and the assumptions we make about it. In the example below, we will use the **t-statistic**, which is based on the **t-distribution** (shown below, similar to a normal dist.).
 
@@ -47,32 +47,54 @@ Several types of test-statistics exist, and which one we use depends on the type
   <img src="../figures/t-dist.png" height="70%" width="70%"/>
 </p>
 
-> ***Degrees of freedom (df)*** represent the number of independent values that can vary in a dataset, and is calculated as the sample size (*N*) - 1. The number of degrees of freedom affects the shape of the t-distribution, as shown in the figure above. 
+> ***Degrees of freedom (df)*** represent the number of independent values that can vary in a dataset, and is calculated as the sample size (*N*) - 1. The number of degrees of freedom affects the shape of the t-distribution, as shown in the figure above.
 
 You can learn more about degrees of freedom [here](https://www.statisticshowto.com/probability-and-statistics/hypothesis-testing/degrees-of-freedom/).
 
-
-Assuming a t-distribution, the **t-statistic** can be calculated using the equation:
+Assuming a t-distribution, the **t-statistic** can be calculated from your dataset using the equation:
 
 *t-statistic* = (*x<sub>i</sub>* - &mu;) / (*s* x sqrt(*n*))
 
-Larger the test-statistic, the further it will be toward the tails of distribution. The tails of the t-distribution contain the least area, therefore obtaining a t-statistic this large simply due to chance is less likely.
+Where:
 
-We can quantify the probability of observing a t-statistic this extreme, we can calculate a **P-value**, defined as *the probability of observing data equal to or more extreme than that observed due to chance*. A table of *'critical values'* can be used to determine if you should reject or accept the null hypothesis at a particular significance level.
+
+
+
+
+
+Placing our test-statistic on the t-distribution (red dotted line in figure below) allows us to see how extreme our result is compared to the null distribution. Larger test-statistics will be further toward the tails of distribution.
 
 <p align="center">
-  <img src="../figures/crit-values.png" height="80%" width="80%"/>
+  <img src="../figures/blank-t.png" height="80%" width="80%"/>
 </p>
 
-Image source: [Statistics How To, online](https://www.statisticshowto.com/tables/t-distribution-table/).
 
-For example, based on the critical values table for the t-distribution shown above, we would need to obtain a t-statistic of at least 2.353 to have a statistically significant finding at a threshold (&alpha;) of 0.05. By setting &alpha; to 0.05, this means we will interpret results as meaningful if they have at most a 5 in 100 probability of being due to chance.
 
-In the below example, the red line indicates a t-statistic that is not extreme enough to be considered statistically significant at 5%.
+To help us decide if the null hypothesis should be rejected or accepted based on this test-statistic, we must calculate a **P-value**, defined as *the probability of observing data equal to or more extreme than that observed due to chance*.
+
+It is sometimes helpful to consider P-values as a %, for example, if you if you have a *P*-value of **0.01**, there is a **1%** chance that your results occurred simply by chance (i.e. randomly). Alternatively, a *P*-value of **0.9** means there is a **90%** chance that this result would be observed by chance.
+
+Visually, the *P*-value is defined as the area under the curve to the right or left of the test-statistic (provided you run a two-tailed test).
+
+<p align="center">
+  <img src="../figures/pvals-example1.png" height="80%" width="80%"/>
+</p>
+
+
+The tails of the t-distribution contain the least area, therefore obtaining a large t-statistic simply due to chance is less likely, suggesting a result is extreme enough to reject the null hypothesis (that no true difference exists between our experimental groups).
+
+If we assume a *P*-value threshold of 0.05 (& a two-tailed test), our test-statistic must be large enough that less than 2.5% of the density under the curve is to the right or left of our this value.
 
 <p align="center">
   <img src="../figures/pvalues.png" height="80%" width="80%"/>
 </p>
+
+In this figure, the test-statistic is large enough that the area under the curve represents a P-value < 0.05, therefore we can reject the null hypothesis and **accept the alternative hypothesis, that a there is significant difference between our comparison groups.**
+
+If the test-statistic was not large enough, and the P-value was >0.05, we would need to accept the null hypothesis that no significant difference exists.
+
+
+
 
 
 > **P-value thresholds:** Although 5% is a commonly used P-value threshold, you can be more or less stringent depending on the nature of your experiment: if you want to be very conservative and restrict your results to few results that are likely to be true positives, you may wish to restrict the results to a more stringent threshold. If your experiment is very preliminary and you care less about capturing some false positives than missing true positives, you may wish to relax your threshold.  
