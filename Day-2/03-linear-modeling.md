@@ -1,5 +1,5 @@
 
-# 02 - Introduction to linear models
+# 03 - Introduction to linear models
 
 ### Learning objectives:
 - Understand the basic principles of linear models and why they are useful in RNA-seq DE analysis
