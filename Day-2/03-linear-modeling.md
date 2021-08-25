@@ -1,5 +1,5 @@
 
-# 02 - Introductiuon to linear models
+# 02 - Introduction to linear models
 
 ### Learning objectives:
 - Understand the basic principles of linear models and why they are useful in RNA-seq DE analysis
@@ -9,14 +9,14 @@
 
 Simple linear models, or linear regression, is used pervasively in bioinformatics and genomics for statistical inference. Linear models are relatively simple, flexible, and interpretable, meaning they make excellent tools for statistical inference and they scale well to thousands of observations, which is critical for common genomics datasets.
 
-Beyond differential expression analysis, many types of genomic data anlaysis rely on linear models:
+Beyond differential expression analysis, many types of genomic data analysis rely on linear models:
 - ChIP-seq (differential binding)
 - ATAC-seq (differential accessibility)
 - Microarray analysis (e.g. DNA methylation)
 - Variant identification (WES/WGS/RNA-seq)
 - Genome-wide association studies (GWAS)
 
-When performing differential expression analysis with popular R-packages such as DESeq2, you usually do not need to explicity define a linear model yourself using base functions in R. However, it is important that you understand what is going on 'under the hood' in order to always perform your analysis correctly.
+When performing differential expression analysis with popular R-packages such as DESeq2, you usually do not need to explicitly define a linear model yourself using base functions in R. However, it is important that you understand what is going on 'under the hood' in order to always perform your analysis correctly.
 
 In the lesson below, we will introduce the basic concepts of linear models and how they can be fit in R, in order to provide you with a foundation upon which to begin learning the basics of differential expression analysis.
 
@@ -141,7 +141,7 @@ coef(sum_lm1)[2,4]
 
 The *P*-value is very small, so we can reject the null, and conclude that Hba1c levels are associated with expression of gene X, and interpret the coefficient as a meaningful quantity.
 
-If the *P*-value does not pass the *a priori* significance threshold for your analysis, the coefficient should be ignored as that predcitor is **not associated** with the response variable.
+If the *P*-value does not pass the *a priori* significance threshold for your analysis, the coefficient should be ignored as that predictor is **not associated** with the response variable.
 
 You can always confirm by looking at the slope in a simple linear model. To demonstrate this, explore the example below for Gene Y and its relation to Hba1c levels.
 ```r
@@ -212,7 +212,7 @@ Looking at the model output, the *P*-value is very small, therefore we can concl
 
 Again, the coefficient tells us about the relationship between the predictor and the response. The coefficient for the predictor `subject_group` tells us that for each unit increase in this variable, there is an increase of 11.2 expression units for gene X.
 
-Since a 'unit increase' in `subject_group` simply means controls vs diseased subjects, we can interpret this as the difference in expression between controls and cases. This is analgous to how we would calculate a fold-change value in an RNA-seq analysis.
+Since a 'unit increase' in `subject_group` simply means controls vs diseased subjects, we can interpret this as the difference in expression between controls and cases. This is analogous to how we would calculate a fold-change value in an RNA-seq analysis.
 
 ------
 
@@ -261,7 +261,7 @@ We can easily see that the counts do not follow a normal distribution: most gene
 
 Based on this observation, the counts cannot be modeled appropriately using a standard linear model. In fact, bulk RNA-seq data generally exhibit a distribution referred to as the *negative-binomial*, therefore we must us a model that assumes this distribution when performing differential expression testing. **We will discuss this in more detail on Friday**.
 
-RNA-seq read counts are also referred to as **heteroscadistic**, meaning they have a *non-constant variance* at different values of the mean across samples. We can see this if we plot the variance in read counts across samples against the mean.
+RNA-seq read counts are also referred to as **heteroscadastic**, meaning they have a *non-constant variance* at different values of the mean across samples. We can see this if we plot the variance in read counts across samples against the mean.
 
 ```r
 # calculate mean and variance for group of replicates
