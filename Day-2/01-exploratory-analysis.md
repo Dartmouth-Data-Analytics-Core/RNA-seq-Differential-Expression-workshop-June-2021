@@ -59,7 +59,7 @@ StatQuest has an excellent [video](https://www.youtube.com/watch?v=_UVHneBUBW0) 
 
 #### Performing PCA on RNA-seq data
 
-To perform mathematical procedures such as PCA, it is best to transform the raw counts. DESeq2 provides its own transformation procedure, called the **regularized logatrithm (rlog)** implemented with the `rlog()` function. The rlog is similar in principle to a standard log transformation of the data, but is able to more appropriately transform the counts for genes with low expression values.
+To perform mathematical procedures such as PCA, it is best to transform the raw counts. DESeq2 provides its own transformation procedure, called the **regularized logarithm (rlog)** implemented with the `rlog()` function. The rlog is similar in principle to a standard log transformation of the data, but is able to more appropriately transform the counts for genes with low expression values.
 
 It is important to note that `rlog()` transformed values incorporates the size factors calculated for DESeq2 normalization of sequencing depth, therefore rlog values are comparable between samples.
 
@@ -76,7 +76,7 @@ dds <- dds[keep,]
 dim(dds)
 ```
 
-Now use the `rlog()` function to implement the regularized logatrithm procedure on our data.
+Now use the `rlog()` function to implement the regularized logarithm procedure on our data.
 ```r
 rld <- rlog(dds, blind = FALSE)
 
@@ -136,7 +136,7 @@ abline(v=250, col="blue")
 At around 500 the variance starts to increase more dramatically, so it would be reasonable to select these as the *'variable features'* for the PCA.
 
 ```r
-# modify variable feature number to be used in PCA and hierachical clutering based on no. of most variable features
+# modify variable feature number to be used in PCA and hierarchical clustering based on no. of most variable features
 var_feature_n <- 500
 
 # calculate the row variance
@@ -145,7 +145,7 @@ rv <- rowVars(assay(rld))
 # order variance by size and select top 500 with most variance
 select <- order(rv, decreasing = TRUE)[1:500]
 
-# subset rlog values for genes with top varaince ranks
+# subset rlog values for genes with top variance ranks
 rld_sub <- assay(rld)[select, ]
 
 # transpose the matrix (rows to columns and columns to rows)
@@ -178,7 +178,7 @@ We can see that the majority of variance in this dataset is explained by the fir
 # construct data frame w/ PC loadings and add sample labels
 pca_df <- as.data.frame(pca$x)
 
-# add a column contaiing tx group
+# add a column containing tx group
 pca_df$tx.group <- dds@colData$tx.group
 
 # add column containing sample IDs
@@ -227,9 +227,9 @@ Multiple batches were not reported in the manuscript for this dataset, however, 
 # add variable to PCA dataframe for batch
 pca_df$batch <- NA
 
-# (artifically) select samples with a PC2 value below 10 to batch 1
+# (artificially) select samples with a PC2 value below 10 to batch 1
 pca_df$batch[pca_df$PC2 < 10] <- "Batch 1"
-# (artifically) select samples with a PC2 value above 10 to batch 2
+# (artificially) select samples with a PC2 value above 10 to batch 2
 pca_df$batch[pca_df$PC2 > 10] <- "Batch 2"
 
 # convert string to factor
@@ -250,7 +250,7 @@ points(pca_df[pca_df$batch=="Batch 2", 1], pca_df[pca_df$batch=="Batch 2", 2],
        col=pca_df$col,
        pch=2, cex=1.35)
 
-# add lehgend
+# add legend
 legend(9.5, 10.5, levels(pca_df$batch), pch = c(16, 2))
 legend(1.5, 11.5, levels(pca_df$tx.group), pch = 16, col = pca_df$col)
 
@@ -269,7 +269,7 @@ The four samples labelled as batch 2 clearly cluster separately on PC2 from the 
 
 #### Dealing with a batch effect
 
-A comprhensive introduction of how to correct for a batch effect is beyond the scope of this workshop, however, a couple of basic options you could explore if you detect a batch effect are included below.
+A comprehensive introduction of how to correct for a batch effect is beyond the scope of this workshop, however, a couple of basic options you could explore if you detect a batch effect are included below.
 
 - statistically remove the batch effect from your data using an algorithm designed specifically for this task. e.g. [ComBat](https://academic.oup.com/nargab/article/2/3/lqaa078/5909519)
 - adjust for batch as a variable in your statistical model when running differential expression
@@ -313,7 +313,7 @@ Expression levels of each gene determine the colors shown in each cell of the he
 Although we will not go into detail on how the clustering algorithm works, **StatQuest** has an [excellent video](https://www.youtube.com/watch?v=7xHsRkOdVwo&ab_channel=StatQuestwithJoshStarmer) that explains the process in more detail, as well as [another video](https://www.youtube.com/watch?v=oMtDyOn2TCc&ab_channel=StatQuestwithJoshStarmer) that summarizes the process of drawing and interpreting heatmaps.
 
 > ##### Distance metrics
-Several distance metrics exist (e.g. euclidean distance, manhattan distance) and are calculated differently. Although the results will often be the same across several distance metrics, which one is most appropriate depends on your dataset.
+Several distance metrics exist (e.g. Euclidean distance, Manhattan distance) and are calculated differently. Although the results will often be the same across several distance metrics, which one is most appropriate depends on your dataset.
 
 #### Cluster the dataset using unsupervised clustering  
 
