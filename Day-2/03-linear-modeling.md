@@ -244,6 +244,9 @@ As we have discussed, RNA-seq is measured in terms of read counts, whose values 
 
 Plot the distribution of normalized read counts from a single sample:
 ```r
+#reload DESeq2 dds object if not saved from previous lesson
+#dds <- readRDS("data/DESeq2.rds")
+
 hist(counts(dds, normalized=FALSE)[,5],
      breaks = 500, col="blue",
      xlab="Raw expression counts",
@@ -261,7 +264,7 @@ We can easily see that the counts do not follow a normal distribution: most gene
 
 Based on this observation, the counts cannot be modeled appropriately using a standard linear model. In fact, bulk RNA-seq data generally exhibit a distribution referred to as the *negative-binomial*, therefore we must us a model that assumes this distribution when performing differential expression testing. **We will discuss this in more detail on Friday**.
 
-RNA-seq read counts are also referred to as **heteroscadastic**, meaning they have a *non-constant variance* at different values of the mean across samples. We can see this if we plot the variance in read counts across samples against the mean.
+RNA-seq read counts are also referred to as **heteroscedastic**, meaning they have a *non-constant variance* at different values of the mean across samples. We can see this if we plot the variance in read counts across samples against the mean.
 
 ```r
 # calculate mean and variance for group of replicates
