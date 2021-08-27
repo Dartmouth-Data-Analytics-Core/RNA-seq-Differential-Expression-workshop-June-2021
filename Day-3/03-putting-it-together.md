@@ -8,7 +8,6 @@
 
 The entire DESeq2 workflow essentially boils down to just a few functions run sequentially. In this lesson we will review them to consolidate our knowledge oh how to perform a complete DE analysis with DESeq2. 
 
-Read in the count data:
 ```r
 #Putting it all together
 
