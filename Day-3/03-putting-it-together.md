@@ -2,7 +2,7 @@
 
 ### Learning objectives:
 - Review the major steps required to perform a complete DE analysis using DESeq2
-
+- Create a baseline for a DESeq2 workflow
 
 ### A complete workflow
 
@@ -103,4 +103,4 @@ write.csv(as.data.frame(res_shrink_ord), file=paste(WORKING_DIRECTORY,"dex_vs_un
 
 ```
 
-Despite DESeq2 being able to be run in an automated way, it is important to understand the functions and calculations within.  If something doesn't look right, you now have the skills and knowledge to be able to pull apart the counts matrix, dds, and results objects.  Additionally, plots of heatmaps based on counts, subsetted by variance, or subsetted by the top differentially expressed genes can be useful.  The above lines of code should be used as a starting point for a fully explored and annotated differentially expression analysis.
+Despite DESeq2 being able to be run in an automated way, it is important to understand the functions and calculations within.  If something doesn't look right, you now have the skills and knowledge to be able to pull apart the counts matrix, dds, and results objects.  Additionally, plots of heatmaps based on counts, subsetted by variance, or subsetted by the top differentially expressed genes can be useful.  The above lines of code should be used as a starting point for a fully explored and annotated differential expression analysis.
