@@ -154,7 +154,8 @@ hist(rnbinom(n = 10000, mu = 100, size = 1/0.1),
 
 Clearly, as the dispersion parameter increases, variation around the mean also increases. To model RNA-seq data using the negative binomial distribution, we must therefore estimate a dispersion parameter for each gene in the dataset.
 
-The mean, variance, and dispersion are linked by the equation:  
+The mean, variance, and dispersion are linked by the equation:
+
 `variance = mean + dispersion x 2 mean-squared ( var = mu + disp. * mu^2)`
 
 In order to accurately model differential expression for the genes in our dataset, `DESeq2` uses this equation to obtain estimates for the dispersion of each gene within each sample group (e.g. Control and Dex separately).
@@ -228,7 +229,12 @@ The formula shown below defines the GLM used for differential expression analysi
 	title="" width="80%" height="80%" />
 </p>
 
-Briefly, the model denotes that the raw counts are modeled using a NB distribution with a fitted mean &mu; and a gene-specific dispersion parameter &alpha;. The fitted mean &mu; is a derived from the expected expression level across samples, and the sample-specific scale factor *q* derived from the median of ratios method (to correct for library size & composition).
+Briefly, the main features of this model:
+- the raw counts are modeled using a NB distribution with a fitted mean ,&mu;, and a gene-specific dispersion parameter, &alpha;
+
+- The mean &mu; is derived from the expected expression level across samples, *q*, and the sample-specific scale factor, *s*, (to correct for library size & composition)
+
+- Expected expression level across samples, *q*, is used to estimate the log2 fold change (&beta;) for each experimental group in design matrix, *x*
 
 By fitting the model using the raw counts, dispersion estimates, and size factors for each gene, we obtain a set of **model coefficients** for each sample group, which can be interpreted as the **log2 fold-change** in expression for that gene between the baseline group and each comparison group.
 
@@ -354,7 +360,7 @@ Count how many NA values are present in the vector of adjusted P-values:
 table(is.na(res$padj))
 ```
 
-These `NA`'s are generated as part of a process referred to in DESeq2 as **independent filtering**, which aims to flag genes that have little or no chance of being expressed, and exclude them from final testing for differential expression.
+These `NA`'s are generated as part of a process referred to in DESeq2 as **independent filtering**, which aims to select genes that have little or no chance of being expressed (mostly low expression genes), and exclude them from final testing for differential expression.
 
 This is valuable as it means fewer genes are tested for DE, and we therefore need to correct for fewer multiple tests, improving our statistical power.
 
@@ -370,9 +376,9 @@ For example, consider the Bonferonni thresholds below, involving correction for 
 
 #### How does Independent filtering work?
 
-DESeq2 carries out an iterative process where it maximizes the value of the number of rejections over the quantiles of the mean normalized counts. Once the maximum number of rejections is identified, DESeq2 will select the quantile of the normalized counts that is 1 standard deviation below this maximum, and filter any results with mean counts below this threshold, reducing the number of tests that need to be corrected for.
+DESeq2 uses an iterative process to find the expression level at which the maximum number of null hypothesis rejections occurs. DESeq2 then selects the expression quantile 1 standard deviation below this maximum, and filters any genes with mean counts below this threshold, reducing the number of tests that need to be corrected for.
 
-Independent filtering can be visualized by plotting the number of rejections of the null hypotesis against mean counts, to help us understand at which mean count value DESeq2 chose to filter results.
+Independent filtering can be visualized by plotting the number of rejections of the null hypothesis against mean counts, to help us understand at which mean count value DESeq2 chose to filter results.
 
 ```r
 # look at independent filtering results table
@@ -380,7 +386,7 @@ metadata(res_ord)$filterNumRej
 
 # plot number of rejections at specific quantiles
 plot(metadata(res_ord)$filterNumRej,
-     type="b", ylab="number of rejections",
+     type="b", ylab="number of null hypoth. rejections",
      xlab="quantiles of filter (mean norm. counts)")
 
 # add line connecting points together

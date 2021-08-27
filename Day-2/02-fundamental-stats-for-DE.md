@@ -56,7 +56,10 @@ Assuming a t-distribution, the **t-statistic** can be calculated from your datas
 *t-statistic* = (*x<sub>i</sub>* - &mu;) / (*s* x sqrt(*n*))
 
 Where:
-
+- *x<sub>i</sub>* = sample mean (*i* denotes this is calculated for each sample)
+- *&mu;* = population mean
+- *s* = standard deviation
+- *n* = sample size
 
 
 
