@@ -90,8 +90,13 @@ png(paste(CONTRAST_TEST, "vs", CONTRAST_BASE, "shrunk_MA.png", sep="_"))
 plotMA(res_shrink)
 dev.off()
 
-#Rrder results
+#Order results
 res_shrink_ord <- res_shrink[order(res$padj),]
+
+#Annotate results with gene name
+annotation_table <- read.delim("GRCh38.p12_ensembl-97.txt", stringsAsFactors = T, header = T)
+annotation_matrix <- match(rownames(res_shrink_ord), annotation_table$Gene.stable.ID)
+res_shrink_ord$gene <- as.character(annotation_table$Gene.name[annotation_matrix])
 
 #Write output CSV
 write.csv(as.data.frame(res_shrink_ord), file=paste(WORKING_DIRECTORY,"dex_vs_untreated_deseq.csv", sep="/"), row.names=T, quote=F )
