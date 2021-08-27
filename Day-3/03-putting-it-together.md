@@ -45,11 +45,46 @@ dds_matrix <- DESeqDataSetFromMatrix(countData = cts,
 #?DESeq
 dds <- DESeq(dds_matrix)
 
-#rld <- rlog(dds, blind = FALSE)
+#Exploratory Plotting
+rld <- rlog(dds, blind = FALSE)
+var_feature_n <- 500
+rv <- rowVars(assay(rld))
+select <- order(rv, decreasing = TRUE)[1:500]
+rld_sub <- assay(rld)[select, ]
+rld_sub <- t(rld_sub)
+pca <- prcomp(rld_sub)
+percentVar <- pca$sdev^2/sum(pca$sdev^2)
+percentVar <- percentVar[1:5]
+names(percentVar) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
+png(paste(CONTRAST_TEST, "vs", CONTRAST_BASE, "PCA_Variance_Explained.png", sep="_"))
+barplot(percentVar, col = "indianred", las = 1, ylab = "% Variance", cex.lab = 1.2)
+dev.off()
+pca_df <- as.data.frame(pca$x)
+pca_df$tx.group <- dds@colData$tx.group
+pca_df$sample_ids <- colnames(dds)
+pca_df$col <- NA
+for(i in 1:length(levels(pca_df$tx.group))){
+  ind1 <- which(pca_df$tx.group == levels(pca_df$tx.group)[i])
+  pca_df$col[ind1] <- i
+}
 
+png(paste(CONTRAST_TEST, "vs", CONTRAST_BASE, "PCA_1_2.png", sep="_"))
+plot(pca_df[, 1], pca_df[, 2],
+     xlab = paste0("PC1 (", (round(percentVar[1], digits=3)*100), "% variance)"),
+     ylab = paste0("PC2 (", (round(percentVar[2], digits=3)*100), "% variance)"),
+     main=paste0("PC1 vs PC2 for ", var_feature_n, " most variable genes"),
+     pch=16, cex=1.35, cex.lab=1.3, cex.axis = 1.15, las=1,
+     panel.first = grid(),
+     col=pca_df$col)
+
+text(pca_df[, 1], pca_df[, 2], labels = pca_df$tx.group, cex=0.6, font=2, pos=4)
+dev.off()
+
+#Dispersion Estimation -- Look at this!
 png(paste(CONTRAST_TEST, "vs", CONTRAST_BASE, "disp_est.png", sep="_"))
 plotDispEsts(dds)
 dev.off()
+
 
 res <- results(dds,
                contrast = c(CONTRAST_NAME, CONTRAST_BASE, CONTRAST_TEST),
