@@ -83,6 +83,6 @@ This workshop will be offered again, in addition to our other bioinformatics wor
 
 ## Bioinformatics office hours & consultations
 
-Please reach out to us with questions related to content from this workshop, or for analysis consultations. We also host **bioinformatics office hours** on **Fridays 1-2pm** for general questions and inquiries (currently on Zoom: https://dartmouth.zoom.us/s/96998379866, password: *bioinfo*)
+Please reach out to us with questions related to content from this workshop, or for analysis consultations. We also host **bioinformatics office hours** on **Fridays 12:30-1:30pm** for general questions and inquiries (currently on Zoom: https://dartmouth.zoom.us/s/96998379866, password: *bioinfo*)
 
 ### Now.... Discussion/question time!
